@@ -27,11 +27,15 @@ pub async fn get<S>(domain: S, path: S) -> Response where S: Into<String> {
 
     let response = String::from_utf8_lossy(bytes);
     //reader.read_to_string(&mut data).await.unwrap();
-    let response_text = format!("{}{}", head_line, response);
+    let mut response_text = format!("{}{}", head_line, response);
 
     println!("{}", response_text);
 
-    let parsed_response: Response = Response::new(response_text, head_line);
+    let mut parsed_response: Response = Response::new(response_text.clone(), head_line.clone());
+    if parsed_response.header_map.get("Transfer-Encoding").unwrap().clone().value.unwrap() == "chunked" {
+        response_text = format!("{}{}", response_text, String::from_utf8_lossy(reader.buffer()));
+        parsed_response = Response::new(response_text, head_line);
+    }
 
     return parsed_response;
 }

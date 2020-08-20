@@ -10,8 +10,10 @@ pub struct Response {
     //pub content_type: String,
     pub headers: Vec<Header>,
     pub header_map: HashMap<String, Header>,
+    pub header_count: usize,
     pub cookies: Vec<Cookie>,
     pub cookie_map: HashMap<String, Cookie>,
+    pub cookie_count: usize,
     pub body: Option<String>
 }
 
@@ -53,8 +55,7 @@ impl Response {
                 if line.starts_with("Set-Cookie:") {
                     cookies.push(utils::parse_cookie(line))
                 } else {
-                    println!("{}", line);
-                    if line == "\r\n" && !is_body || line == "\n" && !is_body {
+                    if line == "" && !is_body || line == "\n" && !is_body {
                         is_body = true
                     } else if is_body {
                         body_lines.push(line);
@@ -65,15 +66,32 @@ impl Response {
             }
         }
 
+        let mut cookie_map = HashMap::<String, Cookie>::new();
+
+        for cookie in cookies.clone() {
+            cookie_map.insert(cookie.name.clone().unwrap(), cookie.clone());
+        }
+
+        let mut header_map = HashMap::<String, Header>::new();
+
+        for header in headers.clone() {
+            header_map.insert(header.name.clone().unwrap(), header.clone());
+        }
+
+        let header_count = headers.len();
+        let cookie_count = cookies.len();
+
         Response {
             raw: raw.escape_default().to_string(),
             protocol: Some(protocol),
             status: Some(status.parse::<isize>().unwrap()),
             status_text: Some(status_text),
             cookies,
-            cookie_map: HashMap::<String, Cookie>::new(),
+            cookie_map,
+            cookie_count,
             headers,
-            header_map: HashMap::<String, Header>::new(),
+            header_map,
+            header_count,
             body: Some(body_lines.join("\n"))
         }
     }

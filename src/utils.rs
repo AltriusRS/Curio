@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use crate::structs::{Cookie, Header};
 
 pub fn parse_cookie(line: &str) -> Cookie {
-    println!("{}", line);
     let mut formatted = line.split("Set-Cookie:").collect::<Vec<&str>>();
     let args = formatted.last().unwrap().split(';').collect::<Vec<&str>>();
     let mut parsed_args = HashMap::<String, String>::new();
@@ -86,7 +85,6 @@ pub fn parse_cookie(line: &str) -> Cookie {
 }
 
 pub fn parse_header(line: &str) -> Header {
-    println!("{}", line);
     let mut parsed_args = HashMap::<String, String>::new();
     let mut keypair = line.split(": ").collect::<Vec<&str>>();
     keypair.reverse();
