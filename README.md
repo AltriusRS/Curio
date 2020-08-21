@@ -7,10 +7,11 @@ A superfast HTTP client for Rust
 
 # Internal Benchmarks
 > Note: These benchmarks are for the internals of Warp, they are not comparable to any other http library, and trying to compare them would be unfair. please do not give me flack for poor performance, as i am new to http, and Rust in general
+
 (all times in microseconds (denoted: `us`) over a span of 10000 runs)
-|Name|Average|High|Low|
-|:---:|:---:|:---:|:---:|
-|Full request cycle|766 us|6323 us|353 us|
-|Parse Cookie|26 us|3497 us|18 us|
-|Parse Header|5 us|326 us|4 us|
-|Parse Response|290 us|11360 us|247 us|
+|Name|Average|High|Low|Standard Deviation|
+|:---:|:---:|:---:|:---:|:---:|
+|Full request cycle|619 us|9280 us|448 us|299 us|
+|Parse Cookie|60 us|247 us|53 us|14 us|
+|Parse Header|4 us|126 us|4 us|2 us|
+|Parse Response|261 us|550 us|235 us|41 us|
