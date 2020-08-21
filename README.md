@@ -1,5 +1,4 @@
-# Curio
-A superfast HTTP client for Rust
+![Curio - A Blazing Fast HTTP Client](https://raw.githubusercontent.com/fatalcenturion/Curio/media/Curio_clear.png)
 
 
 > A quick note: Curio is a pet project, it is not feature complete, it is by far not the best http client out there for rust, nor does it aim to be. The only goal of Curio is to serve as a proof of concept and a learning platform for myself to learn the ins and outs of http/s and how it powers the modern internet
