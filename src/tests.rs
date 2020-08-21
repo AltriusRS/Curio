@@ -1,51 +1,109 @@
 #[allow(non_snake_case)]
 use tokio_test::*;
+use std::time::Instant;
 
 macro_rules! aw {
   ($e:expr) => {
       tokio_test::block_on($e)
   };
 }
+const LIMIT: usize = 10000;
+const TEST_STR: &str = "HTTP/1.1 301 TLS Redirect\r\nDate: Fri, 21 Aug 2020 17:42:29 GMT\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nSet-Cookie: __cfduid=d1cd636ec4303be8a4ac9d8d01f93e1e71598031749; expires=Sun, 20-Sep-20 17:42:29 GMT; path=/; domain=.typicode.com; HttpOnly; SameSite=Lax\r\nX-Powered-By: Express\r\nX-Ratelimit-Limit: 1000\r\nX-Ratelimit-Remaining: 999\r\nX-Ratelimit-Reset: 1597842544\r\nVary: Origin, Accept-Encoding\r\nAccess-Control-Allow-Credentials: true\r\nCache-Control: max-age=43200\r\nPragma: no-cache\r\nExpires: -1\r\nX-Content-Type-Options: nosniff\r\nEtag: W/\"5ef7-4Ad6/n39KWY9q6Ykm/ULNQ2F5IM\"\r\nVia: 1.1 vegur\r\nCF-Cache-Status: HIT\r\nAge: 10212\r\ncf-request-id: 04b3b67aed0000e608b91e0200000001\r\nServer: cloudflare\r\nCF-RAY: 5c6626a4ad9ae608-LHR";
 
-
-// #[test]
-// fn it_works() {
-//     assert_eq!(2 + 2, 4);
-// }
-//
 #[test]
-fn test_json() {
+fn test_GET() {
     let response = aw!(crate::tcp::get("jsonplaceholder.typicode.com", "/todos"));
-    println!("{:#?}", response);
     assert_eq!(response.status_text.unwrap(), String::from("OK"));
 }
-//
-// #[test]
-// fn test_github() {
-//     let response = aw!(crate::tcp::get("github.com", "/"));
-//     println!("{:#?}", response);
-//     assert_eq!(response.status_text.unwrap(), String::from("Moved Permanently"));
-// }
-//
-// #[test]
-// fn test_google() {
-//     let response = aw!(crate::tcp::get("google.com", "/"));
-//     println!("{:#?}", response);
-//     assert_eq!(response.status_text.unwrap(), String::from("Moved Permanently"));
-// }
-//
-// #[test]
-// fn test_wikipedia() {
-//     let response = aw!(crate::tcp::get("en.wikipedia.org", "/wiki/HTTP_cookie#Structure"));
-//     println!("{:#?}", response);
-//     assert_eq!(response.status_text.unwrap(), String::from("TLS Redirect"));
-// }
-//
-// #[test]
-// fn test_response() {
-//     let raw = "HTTP/1.1 301 TLS Redirect\r\nDate: Thu, 20 Aug 2020 15:28:03 GMT\r\nServer: Varnish\r\nX-Varnish: 1053650639\r\nX-Cache: cp3062 int\r\nX-Cache-Status: int-front\r\nServer-Timing: cache;desc=\"int-front\"\r\nSet-Cookie: WMF-Last-Access=20-Aug-2020;Path=/;HttpOnly;secure;Expires=Mon, 21 Sep 2020 12:00:00 GMT\r\nSet-Cookie: WMF-Last-Access-Global=20-Aug-2020;Path=/;Domain=.wikipedia.org;HttpOnly;secure;Expires=Mon, 21 Sep 2020 12:00:00 GMT\r\nX-Client-IP: 94.5.43.32\r\nLocation: https://en.wikipedia.org/wiki/HTTP_cookie#Structure\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n".to_string();
-//     let header_line = "HTTP/1.1 301 TLS Redirect\r\n".to_string();
-//     let response = crate::structs::Response::new(raw, header_line);
-//     println!("{:#?}", response);
-//     assert_eq!(response.status_text.unwrap(), String::from("TLS Redirect"));
-// }
+
+#[test]
+fn bench_response_parsing() {
+    bench("parse response", LIMIT, || {
+        let header_line = "HTTP/1.1 301 TLS Redirect\r\n".to_string();
+        let response = crate::structs::Response::new(String::from(TEST_STR), header_line);
+    })
+}
+
+#[test]
+fn bench_cookie_parsing() {
+    let cookie = "Set-Cookie: has_recent_activity=1; path=/; expires=Fri, 21 Aug 2020 21:11:53 GMT; secure; HttpOnly; SameSite=Lax";
+    bench("parse cookie", LIMIT, || {
+        let cookie = crate::utils::parse_cookie(cookie);
+    })
+}
+
+#[test]
+fn bench_header_parsing() {
+    let header = "Date: Fri, 21 Aug 2020 17:42:29 GMT";
+    bench("parse header", LIMIT, || {
+        let header = crate::utils::parse_header(header);
+    })
+}
+
+#[test]
+fn bench_full_request_localhost() {
+    bench("full request cycle", LIMIT, || {
+        let resp = aw!(crate::tcp::get("localhost", "/"));
+    })
+}
+
+fn bench<A, B>(name: A, passes: usize, call: B) -> () where A: Into<String>, B: Fn() -> () {
+    let mut passed = 0;
+
+    let mut times = Vec::<u128>::new();
+
+    while passed < passes {
+        let start = Instant::now();
+
+        call();
+
+        times.push(start.elapsed().as_micros());
+
+        passed += 1;
+    }
+
+    let mut total: usize = 0;
+
+    let mut avg: usize = 0;
+    let mut high: usize = 0;
+    let mut low: usize = 10000;
+
+    for time in times.clone() {
+        let t = time as usize;
+        total += t;
+        if t > high {
+            high = t;
+        } else if t < low {
+            low = t;
+        }
+    }
+
+    avg = total / LIMIT;
+
+    println!("{}; ({} passes): Avg: {} us  |  High: {} us  |  Low: {} us  |  S.D: {} us", name.into(), passes, avg.clone(), high, low, std_deviation(times, avg).unwrap_or(0));
+
+    return assert_eq!(1, 1);
+}
+
+fn std_deviation(data: Vec<u128>, mean: usize) -> Option<usize> {
+    let mut data2 = Vec::<u32>::new();
+    let mean2 = mean as u32;
+    for x in data {
+        data2.push(x as u32)
+    }
+
+    let mean3 = mean2 as f32;
+
+    match (mean3, data2.len()) {
+        (data_mean, count) if count > 0 => {
+            let variance = data2.iter().map(|value| {
+                let diff = data_mean - (*value as f32);
+
+                diff * diff
+            }).sum::<f32>() / count as f32;
+
+            Some(variance.sqrt() as usize)
+        },
+        _ => None
+    }
+}

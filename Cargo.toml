@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 tokio = { version = "0.2", features = ["net", "io-std", "io-util", "rt-threaded"] }
 tokio-test = "0.2.1"
+thincollections = "0.5.3"

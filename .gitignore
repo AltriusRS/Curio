@@ -1,3 +1,6 @@
 /target
 Cargo.lock
 /.idea
+/node_modules
+package-lock.json
+test_server.js

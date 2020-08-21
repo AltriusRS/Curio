@@ -115,42 +115,34 @@ pub fn new_response(raw: String, head_line: String) -> Response {
     let status_text = head_content.join(" ");
 
     let lines = raw.split("\r\n").collect::<Vec<&str>>();
-    let mut cookies = Vec::<Cookie>::new();
-    let mut headers = Vec::<Header>::new();
+    let mut cookies = HashMap::<String, Cookie>::new();
+    let mut headers = HashMap::<String, String>::new();
     let mut is_body = false;
     let mut body_lines = Vec::<&str>::new();
     for line in lines {
         if !line.starts_with("HTTP") {
             if line.starts_with("Set-Cookie:") {
-                cookies.push(parse_cookie(line))
+                let cookie = parse_cookie(line);
+                cookies.insert(cookie.name.clone().unwrap(), cookie);
             } else {
                 if line == "" && !is_body || line == "\n" && !is_body {
-                    is_body = true
+                    is_body = true;
                 } else if is_body {
                     body_lines.push(line);
                 } else {
-                    headers.push(parse_header(line))
+                    let header = parse_header(line);
+                    headers.insert(header.name.unwrap(), header.value.unwrap());
                 }
             }
         }
     }
 
-    let mut cookie_map = HashMap::<String, String>::new();
-    let mut header_map = HashMap::<String, String>::new();
-
-    for cookie in cookies.clone() {
-        cookie_map.insert(cookie.name.unwrap(), cookie.value.unwrap());
-    }
-
-    for header in headers.clone() {
-        header_map.insert(header.name.unwrap(), header.value.unwrap());
-    }
 
     let header_count = headers.len();
     let cookie_count = cookies.len();
 
     let mut chunk_size: Option<i64> = None;
-    let encoding = header_map.get("Transfer-Encoding");
+    let encoding = headers.get("Transfer-Encoding");
     if encoding != None {
         if encoding.unwrap() == &String::from("chunked") {
             body_lines.reverse();
@@ -159,18 +151,22 @@ pub fn new_response(raw: String, head_line: String) -> Response {
         }
     }
 
+    let mut body = None;
+
+    if body_lines.len() > 0 {
+        body = Some(body_lines.join("\n"))
+    }
+
     Response {
         raw: raw.escape_default().to_string(),
         protocol: Some(protocol),
         status: Some(status.parse::<isize>().unwrap()),
         status_text: Some(status_text),
         cookies,
-        cookie_map,
         cookie_count,
         headers,
-        header_map,
         header_count,
-        body: Some(body_lines.join("\n")),
+        body,
         chunk_size,
     }
 }
