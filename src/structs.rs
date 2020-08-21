@@ -9,12 +9,13 @@ pub struct Response {
     pub status_text: Option<String>,
     //pub content_type: String,
     pub headers: Vec<Header>,
-    pub header_map: HashMap<String, Header>,
+    pub header_map: HashMap<String, String>,
     pub header_count: usize,
     pub cookies: Vec<Cookie>,
-    pub cookie_map: HashMap<String, Cookie>,
+    pub cookie_map: HashMap<String, String>,
     pub cookie_count: usize,
-    pub body: Option<String>
+    pub body: Option<String>,
+    pub chunk_size: Option<i64>,
 }
 
 #[derive(Debug, Clone)]
@@ -38,62 +39,7 @@ pub struct Cookie {
 
 impl Response {
     pub fn new(raw: String, head_line: String) -> Response {
-        let mut head_content: Vec<&str> = head_line.split_ascii_whitespace().collect();
-        head_content.reverse();
-        let protocol = head_content.pop().unwrap().to_owned();
-        let status = head_content.pop().unwrap().to_owned();
-        head_content.reverse();
-        let status_text = head_content.join(" ");
-
-        let lines = raw.split("\r\n").collect::<Vec<&str>>();
-        let mut cookies = Vec::<Cookie>::new();
-        let mut headers = Vec::<Header>::new();
-        let mut is_body = false;
-        let mut body_lines = Vec::<&str>::new();
-        for line in lines {
-            if !line.starts_with("HTTP") {
-                if line.starts_with("Set-Cookie:") {
-                    cookies.push(utils::parse_cookie(line))
-                } else {
-                    if line == "" && !is_body || line == "\n" && !is_body {
-                        is_body = true
-                    } else if is_body {
-                        body_lines.push(line);
-                    } else {
-                        headers.push(utils::parse_header(line))
-                    }
-                }
-            }
-        }
-
-        let mut cookie_map = HashMap::<String, Cookie>::new();
-
-        for cookie in cookies.clone() {
-            cookie_map.insert(cookie.name.clone().unwrap(), cookie.clone());
-        }
-
-        let mut header_map = HashMap::<String, Header>::new();
-
-        for header in headers.clone() {
-            header_map.insert(header.name.clone().unwrap(), header.clone());
-        }
-
-        let header_count = headers.len();
-        let cookie_count = cookies.len();
-
-        Response {
-            raw: raw.escape_default().to_string(),
-            protocol: Some(protocol),
-            status: Some(status.parse::<isize>().unwrap()),
-            status_text: Some(status_text),
-            cookies,
-            cookie_map,
-            cookie_count,
-            headers,
-            header_map,
-            header_count,
-            body: Some(body_lines.join("\n"))
-        }
+        utils::new_response(raw, head_line)
     }
 }
 

@@ -23,18 +23,24 @@ pub async fn get<S>(domain: S, path: S) -> Response where S: Into<String> {
     let mut head_line = String::new();
     reader.read_line(&mut head_line).await;
 
-    let bytes = reader.buffer();
+    let mut bytes = reader.buffer();
 
-    let response = String::from_utf8_lossy(bytes);
-    //reader.read_to_string(&mut data).await.unwrap();
+    let mut response = String::from_utf8_lossy(&*bytes);
+
     let mut response_text = format!("{}{}", head_line, response);
 
-    println!("{}", response_text);
-
     let mut parsed_response: Response = Response::new(response_text.clone(), head_line.clone());
-    if parsed_response.header_map.get("Transfer-Encoding").unwrap().clone().value.unwrap() == "chunked" {
-        response_text = format!("{}{}", response_text, String::from_utf8_lossy(reader.buffer()));
-        parsed_response = Response::new(response_text, head_line);
+
+    let mut passes = 0;
+    if parsed_response.chunk_size != None {
+        while parsed_response.chunk_size.clone().unwrap() > 0 && passes < 10 {
+            println!("Chunk Size: {}", parsed_response.chunk_size.clone().unwrap());
+            bytes = reader.buffer();
+            response = String::from_utf8_lossy(bytes);
+            response_text = format!("{}{}", response_text, response);
+            parsed_response = Response::new(response_text.clone(), head_line.clone());
+            passes += 1;
+        }
     }
 
     return parsed_response;
