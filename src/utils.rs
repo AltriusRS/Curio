@@ -1,4 +1,4 @@
-use std::{fmt::Write, num::ParseIntError};
+use std::fmt::Write;
 use std::collections::HashMap;
 use crate::structs::{Cookie, Header, Response};
 

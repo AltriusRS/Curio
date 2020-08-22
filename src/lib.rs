@@ -1,3 +1,4 @@
+mod tls;
 mod tcp;
 mod structs;
 mod utils;

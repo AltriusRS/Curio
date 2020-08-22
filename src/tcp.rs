@@ -1,47 +1,55 @@
-use tokio::prelude::*;
-use tokio::net::TcpStream;
-use tokio::io::{BufReader, BufWriter};
+use std::net::TcpStream;
 use crate::structs::Response;
+use std::io::{Write, Read};
 
-pub async fn get<S>(domain: S, path: S) -> Response where S: Into<String> {
+
+pub fn get<S: Into<String>>(domain: S, path: S) {
     let host = domain.into();
     let location = path.into();
 
     let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
-    let mut stream = TcpStream::connect(format!("{}:80", host)).await.unwrap();
+    let mut stream = TcpStream::connect(format!("{}:80", host)).unwrap();
 
-    let (read_stream, write_stream) = stream.split();
+    stream.write_all(request.as_bytes()).unwrap();
+    stream.flush().unwrap();
 
-    let mut writer = BufWriter::new(write_stream);
+    let mut bytes: [u8; 32] = [0; 32];
+    stream.read(&mut bytes);
 
-    let mut reader = BufReader::new(read_stream);
-
-    writer.write_all(request.as_bytes()).await.unwrap();
-    writer.flush().await.unwrap();
-
-    let mut head_line = String::new();
-    reader.read_line(&mut head_line).await;
-
-    let mut bytes = reader.buffer();
-
-    let mut response = String::from_utf8_lossy(&*bytes);
-
-    let mut response_text = format!("{}{}", head_line, response);
-
-    let mut parsed_response: Response = Response::new(response_text.clone(), head_line.clone());
-
-    let mut passes = 0;
-    if parsed_response.chunk_size != None {
-        while parsed_response.chunk_size.clone().unwrap() > 0 && passes < 10 {
-            //println!("Chunk Size: {}", parsed_response.chunk_size.clone().unwrap());
-            bytes = reader.buffer();
-            response = String::from_utf8_lossy(bytes);
-            response_text = format!("{}{}", response_text, response);
-            parsed_response = Response::new(response_text.clone(), head_line.clone());
-            passes += 1;
-        }
+    let mut response = String::from_utf8_lossy(&bytes).to_string();
+    println!("Bytes read: 32  |  Content: {}", response);
+    while !response.contains("\r\n") {
+        bytes = [0; 32];
+        stream.read(&mut bytes);
+        response = format!("{}{}", response, String::from_utf8_lossy(&bytes));
+        println!("Bytes read: 32  |  Content: {}", response);
     }
 
-    return parsed_response;
+    while !response.ends_with("\r\n") {
+        bytes = [0; 32];
+        stream.read(&mut bytes);
+        response = format!("{}{}", response, String::from_utf8_lossy(&bytes));
+        println!("Bytes read: 32  |  Content: {}", response);
+    }
+    // let res = response.split("\r\n").collect::<Vec<&str>>();
+    // let head_line = res.first().unwrap().clone().to_string();
+    // response = format!("{}\r\n{}", head_line.clone(), response);
+    // println!("Head Line: {}\nContent: {}", head_line, response);
+
+    // let mut parsed_response: Response = Response::new(response_text.clone(), head_line.clone());
+    //
+    // let mut passes = 0;
+    // if parsed_response.chunk_size != None {
+    //     while parsed_response.chunk_size.clone().unwrap() > 0 && passes < 10 {
+    //         //println!("Chunk Size: {}", parsed_response.chunk_size.clone().unwrap());
+    //         bytes = stream.bytes().collect::<[u8]>();
+    //         response = String::from_utf8_lossy(&bytes);
+    //         response_text = format!("{}{}", response_text, response);
+    //         parsed_response = Response::new(response_text.clone(), head_line.clone());
+    //         passes += 1;
+    //     }
+    // }
+    //
+    // return parsed_response;
 }

@@ -1,5 +1,5 @@
 [package]
-name = "warp"
+name = "curio"
 version = "0.1.0"
 authors = ["fatalcenturion <tom.b.2k2@gmail.com>"]
 edition = "2018"
@@ -9,4 +9,6 @@ edition = "2018"
 [dependencies]
 tokio = { version = "0.2", features = ["net", "io-std", "io-util", "rt-threaded"] }
 tokio-test = "0.2.1"
-thincollections = "0.5.3"
+rustls = "0.18.1"
+webpki-roots = "0.20.0"
+webpki = "0.21.3"
