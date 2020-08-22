@@ -1,6 +1,6 @@
 ![Curio - A Blazing Fast HTTP Client](https://raw.githubusercontent.com/fatalcenturion/Curio/media/Curio_clear.png)
 
-![Rust](https://github.com/fatalcenturion/Curio/workflows/CI/badge.svg?branch=master)
+![Rust](https://github.com/fatalcenturion/Curio/workflows/CI/badge.svg?branch=master) ![Discord](https://img.shields.io/discord/275377268728135680) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/fatalcenturion/Curio)
 
 > A quick note: Curio is a pet project. 
 > On that note, Curio is built to [spec](https://www.w3.org/Protocols/rfc2616/rfc2616.html) so if you have any feature additions, please do not hesitate to open an issue.
