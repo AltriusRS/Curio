@@ -1,5 +1,6 @@
 ![Curio - A Blazing Fast HTTP Client](https://raw.githubusercontent.com/fatalcenturion/Curio/media/Curio_clear.png)
 
+![Rust](https://github.com/fatalcenturion/Curio/workflows/Rust/badge.svg?branch=master)
 
 > A quick note: Curio is a pet project. 
 > On that note, Curio is built to [spec](https://www.w3.org/Protocols/rfc2616/rfc2616.html) so if you have any feature additions, please do not hesitate to open an issue.
