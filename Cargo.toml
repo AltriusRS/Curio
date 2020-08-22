@@ -14,8 +14,6 @@ categories = ["network-programming", "web-programming::http-client"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "0.2", features = ["net", "io-std", "io-util", "rt-threaded"] }
-tokio-test = "0.2.1"
 rustls = "0.18.1"
 webpki-roots = "0.20.0"
 webpki = "0.21.3"

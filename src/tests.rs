@@ -1,19 +1,14 @@
 #[allow(non_snake_case)]
-use tokio_test::*;
 use std::time::Instant;
 
-macro_rules! aw {
-  ($e:expr) => {
-      tokio_test::block_on($e)
-  };
-}
+
 const LIMIT: usize = 10000;
 const TEST_STR: &str = "HTTP/1.1 301 TLS Redirect\r\nDate: Fri, 21 Aug 2020 17:42:29 GMT\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nSet-Cookie: __cfduid=d1cd636ec4303be8a4ac9d8d01f93e1e71598031749; expires=Sun, 20-Sep-20 17:42:29 GMT; path=/; domain=.typicode.com; HttpOnly; SameSite=Lax\r\nX-Powered-By: Express\r\nX-Ratelimit-Limit: 1000\r\nX-Ratelimit-Remaining: 999\r\nX-Ratelimit-Reset: 1597842544\r\nVary: Origin, Accept-Encoding\r\nAccess-Control-Allow-Credentials: true\r\nCache-Control: max-age=43200\r\nPragma: no-cache\r\nExpires: -1\r\nX-Content-Type-Options: nosniff\r\nEtag: W/\"5ef7-4Ad6/n39KWY9q6Ykm/ULNQ2F5IM\"\r\nVia: 1.1 vegur\r\nCF-Cache-Status: HIT\r\nAge: 10212\r\ncf-request-id: 04b3b67aed0000e608b91e0200000001\r\nServer: cloudflare\r\nCF-RAY: 5c6626a4ad9ae608-LHR";
 
 #[test]
 fn test_GET() {
     let response = crate::tcp::get("github.com", "/Hexeption/Optifine-SRC/blob/master/Optifine%20SRC%20Version%20%5B1.10.2%20HD%20U%20C1%5D.rar");
-    assert_eq!(1,1)
+    assert_eq!(1, 1)
     //assert_eq!(response.status_text.unwrap(), String::from("OK"));
 }
 
@@ -29,40 +24,33 @@ fn test_request_builder() {
 fn test_request_builder_GET() {
     let response = crate::tls::get("spacelaunchnow.me", "/api/3.3.0/agencies/");
     //println!("{:#?}", response);
-    assert_eq!(1,1)
+    assert_eq!(1, 1)
     //assert_eq!(response.status_text.unwrap(), String::from("OK"));
 }
 
-// #[test]
-// fn bench_response_parsing() {
-//     bench("parse response", LIMIT, || {
-//         let header_line = "HTTP/1.1 301 TLS Redirect\r\n".to_string();
-//         let response = crate::structs::Response::new(String::from(TEST_STR), header_line);
-//     })
-// }
-//
-// #[test]
-// fn bench_cookie_parsing() {
-//     let cookie = "Set-Cookie: has_recent_activity=1; path=/; expires=Fri, 21 Aug 2020 21:11:53 GMT; secure; HttpOnly; SameSite=Lax";
-//     bench("parse cookie", LIMIT, || {
-//         let cookie = crate::utils::parse_cookie(cookie);
-//     })
-// }
-//
-// #[test]
-// fn bench_header_parsing() {
-//     let header = "Date: Fri, 21 Aug 2020 17:42:29 GMT";
-//     bench("parse header", LIMIT, || {
-//         let header = crate::utils::parse_header(header);
-//     })
-// }
-//
-// #[test]
-// fn bench_full_request_localhost() {
-//     bench("full request cycle", LIMIT, || {
-//         let resp = aw!(crate::tcp::get("localhost", "/"));
-//     })
-// }
+#[test]
+fn bench_response_parsing() {
+    bench("parse response", LIMIT, || {
+        let header_line = "HTTP/1.1 301 TLS Redirect\r\n".to_string();
+        let response = crate::structs::Response::new(String::from(TEST_STR), header_line);
+    })
+}
+
+#[test]
+fn bench_cookie_parsing() {
+    let cookie = "Set-Cookie: has_recent_activity=1; path=/; expires=Fri, 21 Aug 2020 21:11:53 GMT; secure; HttpOnly; SameSite=Lax";
+    bench("parse cookie", LIMIT, || {
+        let cookie = crate::utils::parse_cookie(cookie);
+    })
+}
+
+#[test]
+fn bench_header_parsing() {
+    let header = "Date: Fri, 21 Aug 2020 17:42:29 GMT";
+    bench("parse header", LIMIT, || {
+        let header = crate::utils::parse_header(header);
+    })
+}
 
 fn bench<A, B>(name: A, passes: usize, call: B) -> () where A: Into<String>, B: Fn() -> () {
     let mut passed = 0;
