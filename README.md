@@ -1,11 +1,11 @@
 ![Curio - A Blazing Fast HTTP Client](https://raw.githubusercontent.com/fatalcenturion/Curio/media/Curio_clear.png)
 
 
-> A quick note: Curio is a pet project, it is not feature complete, it is by far not the best http client out there for rust, nor does it aim to be. The only goal of Curio is to serve as a proof of concept and a learning platform for myself to learn the ins and outs of http/s and how it powers the modern internet
+> A quick note: Curio is a pet project. 
 > On that note, Curio is built to [spec](https://www.w3.org/Protocols/rfc2616/rfc2616.html) so if you have any feature additions, please do not hesitate to open an issue.
 
 # Internal Benchmarks
-> Note: These benchmarks are for the internals of Curio, they are not comparable to any other http library, and trying to compare them would be unfair. please do not give me flack for poor performance, as i am new to http, and Rust in general
+> Note: These benchmarks are for the internals of Curio, they are not comparable to any other http client.
 
 (all times in microseconds (denoted: `us`) over a span of 10000 runs)
 |Name|Average|High|Low|Standard Deviation|
