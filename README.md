@@ -12,14 +12,19 @@ Its primary goal above all else is performance, closely followed by ease of use.
 If You are proficient in Rust, and know how to help me improve the performance of Curio, please do not hesitate to open an issue tagged with the feature tag.
 If you have a feature you think would be perfect for Curio, and would be useful to more than just yourself, please open an issue with the feature tag.
 
-----------
+
 ### Why should i use Curio over <other rust http library>?
 
 Long story short; you shouldnt. Curio will likely never reach a stage of feature-completeness rivaling the more mature clients.
 
+
 ### Does Curio support X?
+
 Again, probably not, and it possibly never will.
 If i can find the time to add the feature then it might, but i have to split my time between a part time job, college, coding, and myself, so it is unlikely that i will be able to find the time to code a lot in one session.
+
+
+------
 
 
 # Documentation
