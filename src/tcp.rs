@@ -32,6 +32,7 @@ pub fn get<S: Into<String>>(domain: S, path: S) {
         response = format!("{}{}", response, String::from_utf8_lossy(&bytes));
         println!("Bytes read: 32  |  Content: {}", response);
     }
+
     // let res = response.split("\r\n").collect::<Vec<&str>>();
     // let head_line = res.first().unwrap().clone().to_string();
     // response = format!("{}\r\n{}", head_line.clone(), response);

@@ -1,8 +1,15 @@
 [package]
 name = "curio"
-version = "0.1.0"
+version = "0.0.1"
 authors = ["fatalcenturion <tom.b.2k2@gmail.com>"]
 edition = "2018"
+description = "A blazing fast http client"
+repository = "https://github.com/fatalcenturion/Curio"
+readme = "README.md"
+homepage = "https://github.com/fatalcenturion/Curio"
+license = "MIT OR Apache-2.0"
+keyworks = ["http", "client", "https", "open_source"]
+categories = ["network-programming", "web-programming::http-client"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

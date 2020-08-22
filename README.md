@@ -5,6 +5,10 @@
 > A quick note: Curio is a pet project. 
 > On that note, Curio is built to [spec](https://www.w3.org/Protocols/rfc2616/rfc2616.html) so if you have any feature additions, please do not hesitate to open an issue.
 
+# Documentation
+
+Currently this library is heavily under development and as such is completely nonfunctional. There are no docs to ensure nobody uses it in its current state other than the developer.
+
 # Internal Benchmarks
 > Note: These benchmarks are for the internals of Curio, they are not comparable to any other http client.
 
