@@ -1,0 +1,6 @@
+#landing {
+    flex-grow: 5;
+    width: 100%;
+    padding: 5em;
+    align-self: center;
+}

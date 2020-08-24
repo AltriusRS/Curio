@@ -4,23 +4,37 @@
     font-family: 'Noto Sans', sans-serif;
     margin: 0;
     padding: 0;
+    color: aliceblue;
 }
 
 body {
     background-color: #0E3163;
+    height: 100%;
+    width: 100%;
 }
+/*1655A8*/
 
-.navbar {
-    display: flex;
-    background-color: #1655A8;
+.navbar span {
+    display: inline flow-root list-item;
+    flex-direction: row;
+    background-color: #3f3f3f;
     width: 100%;
     height: 5em;
 }
 
 .navbar .nav-icon img {
     height: 4em;
+    align-self: flex-start;
     margin: 0.5em 1em;
     float: left;
+    flex-grow: 1;
+}
+
+.navbar ul {
+    align-self: flex-end;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
 }
 
 .navbar .nav-list {
@@ -29,30 +43,64 @@ body {
 }
 
 .navbar li {
-    border: 1px solid #000;
+    flex-grow: 2;
     list-style-type: none;
-    height: 100%;
-    min-width: 15em;
+    margin:0;
     display: inline-block;
 }
 
-.navbar li .nav-button a {
+.navbar li {
+    margin: 0;
+    flex-grow: 2;
+    min-width: 10em;
+    padding: 1.5em 1em;
+}
+
+.navbar li .active {
+    text-decoration: underline;
+}
+
+.navbar li a {
     height: 100%;
     width: 100%;
 }
 
-.navbar li .nav-button a:link {
+.navbar li  a:link {
     text-decoration: none;
 }
 
-.navbar li .nav-button a:active {
+.navbar li  a:active {
     text-decoration: none;
 }
 
-.navbar li .nav-button a:visited {
+.navbar li  a:visited {
     text-decoration: none;
 }
 
-.navbar li .nav-button a:hover {
+.navbar li  a:hover {
     text-decoration: underline;
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    background-color: #181a1b;
+}
+
+.footer {
+    display: flex;
+    text-align: center;
+    background-color: #3f3f3f;
+    width: 100%;
+    height: 3em;
+    position: absolute;
+    bottom: 0;
+}
+
+.footer h5 {
+    flex-grow: 5;
+    padding: 1em;
+    text-align: center;
 }
