@@ -2,5 +2,7 @@
     flex-grow: 5;
     width: 100%;
     padding: 5em;
+    height: 10em;
     align-self: center;
+    text-align: center;
 }
