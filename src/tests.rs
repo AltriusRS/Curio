@@ -6,7 +6,7 @@ const LIMIT: usize = 10000;
 const TEST_STR: &str = "HTTP/1.1 301 TLS Redirect\r\nDate: Fri, 21 Aug 2020 17:42:29 GMT\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nSet-Cookie: __cfduid=d1cd636ec4303be8a4ac9d8d01f93e1e71598031749; expires=Sun, 20-Sep-20 17:42:29 GMT; path=/; domain=.typicode.com; HttpOnly; SameSite=Lax\r\nX-Powered-By: Express\r\nX-Ratelimit-Limit: 1000\r\nX-Ratelimit-Remaining: 999\r\nX-Ratelimit-Reset: 1597842544\r\nVary: Origin, Accept-Encoding\r\nAccess-Control-Allow-Credentials: true\r\nCache-Control: max-age=43200\r\nPragma: no-cache\r\nExpires: -1\r\nX-Content-Type-Options: nosniff\r\nEtag: W/\"5ef7-4Ad6/n39KWY9q6Ykm/ULNQ2F5IM\"\r\nVia: 1.1 vegur\r\nCF-Cache-Status: HIT\r\nAge: 10212\r\ncf-request-id: 04b3b67aed0000e608b91e0200000001\r\nServer: cloudflare\r\nCF-RAY: 5c6626a4ad9ae608-LHR";
 
 #[test]
-fn test_GET() {
+fn test_get() {
     let response = crate::tcp::get("github.com", "/Hexeption/Optifine-SRC/blob/master/Optifine%20SRC%20Version%20%5B1.10.2%20HD%20U%20C1%5D.rar");
     assert_eq!(1, 1)
     //assert_eq!(response.status_text.unwrap(), String::from("OK"));
@@ -21,11 +21,11 @@ fn test_request_builder() {
 }
 
 #[test]
-fn test_request_builder_GET() {
-    let response = crate::tls::get("spacelaunchnow.me", "/api/3.3.0/agencies/");
+fn test_request_builder_get() {
+    let response = crate::structs::Request::get("http://jsonplaceholder.typicode.com/todos/").send().unwrap();
+
     //println!("{:#?}", response);
-    assert_eq!(1, 1)
-    //assert_eq!(response.status_text.unwrap(), String::from("OK"));
+    assert_eq!(1, 1);
 }
 
 #[test]
