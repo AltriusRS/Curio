@@ -7,7 +7,7 @@ const TEST_STR: &str = "HTTP/1.1 301 TLS Redirect\r\nDate: Fri, 21 Aug 2020 17:4
 
 #[test]
 fn test_get() {
-    let response = crate::tcp::get("github.com", "/Hexeption/Optifine-SRC/blob/master/Optifine%20SRC%20Version%20%5B1.10.2%20HD%20U%20C1%5D.rar");
+    let response = crate::tcp::get("jsonplaceholder.typicode.com", "/todos/");
     assert_eq!(1, 1)
     //assert_eq!(response.status_text.unwrap(), String::from("OK"));
 }

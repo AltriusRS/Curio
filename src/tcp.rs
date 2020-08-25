@@ -16,15 +16,12 @@ pub fn get<S: Into<String>>(domain: S, path: S) {
 
     let mut reader = BufReader::new(&mut stream);
     let mut received: Vec<u8> = reader.fill_buf().unwrap().to_vec();
-    while received.len() < reader.buffer().len() {
-        received = reader.fill_buf().unwrap().to_vec();
-    }
+
     reader.consume(received.len());
     let mut response = String::from_utf8(received.clone()).unwrap();
     let mut lines = response.split("\r\n").collect::<Vec<&str>>().clone();
 
     let head_line = lines.first().unwrap().clone().to_string();
-    println!("Head Line: {}\nContent: {}", head_line, response);
 
     let mut parsed_response: Response = Response::new(lines.join("\r\n").clone(), head_line.clone());
     println!("{:#?}", parsed_response);
@@ -32,19 +29,28 @@ pub fn get<S: Into<String>>(domain: S, path: S) {
     let mut passes = 0;
 
     if parsed_response.chunk_size != None {
-        while parsed_response.chunk_size.clone() != None && parsed_response.chunk_size.clone().unwrap() > 0 && passes < 100 {
+        while parsed_response.chunk_size.clone().unwrap() > 0 && passes < 5{
             println!("Chunk Size: {}", parsed_response.chunk_size.clone().unwrap());
-            received = reader.fill_buf().unwrap().to_vec();
-            while received.len() < reader.buffer().len() {
-                received = reader.fill_buf().unwrap().to_vec();
+            let mut temp_buf = reader.fill_buf().unwrap().to_vec();
+            if temp_buf == received {
+                break;
             }
-            reader.consume(received.len());
+            // while temp_buf.len() < reader.buffer().len() {
+            //     temp_buf.extend(reader.fill_buf().unwrap().to_vec());
+            // }
+            reader.consume(temp_buf.len());
+
+            received.extend(temp_buf);
+
             response = String::from_utf8(received.clone()).unwrap();
+
             parsed_response = Response::new(response.clone(), head_line.clone());
+
             passes += 1;
         }
     }
 
+    return ();
     // return parsed_response;
 }
 
