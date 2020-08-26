@@ -7,6 +7,13 @@ fn test_get() {
 }
 
 #[test]
+fn test_chunked_get() {
+    let response = crate::tcp::get("jsonplaceholder.typicode.com", "/todos/");
+    println!("{:#?}", response);
+    assert_eq!(response.status.unwrap(), 200);
+}
+
+#[test]
 fn test_head() {
     let response = crate::tcp::head("raw.githubusercontent.com", "/fatalcenturion/Curio/master/README.md");
     println!("{:#?}", response);
@@ -27,6 +34,14 @@ fn test_tls_get() {
     println!("{:#?}", response);
     assert_eq!(response.status.unwrap(), 200);
 }
+
+#[test]
+fn test_tls_chunked_get() {
+    let response = crate::tls::get("jsonplaceholder.typicode.com", "/todos/", true);
+    println!("{:#?}", response);
+    assert_eq!(response.status.unwrap(), 200);
+}
+
 
 #[test]
 fn test_tls_head() {

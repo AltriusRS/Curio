@@ -48,7 +48,7 @@ pub fn get<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Response  {
 
     if !parsed_response.headers.contains_key("Content-Length") {
         if parsed_response.headers.get("Transfer-Encoding").unwrap_or(&String::new()) == &String::from("chunked") {
-            while lines.last().unwrap_or(&String::from("")) != &String::from("\n") {
+            while lines.last().unwrap_or(&String::from("")) != &String::from("\r\n") {
                 let mut buf_str = String::new();
                 reader.read_line(&mut buf_str);
                 lines.push(buf_str.clone());
