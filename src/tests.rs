@@ -3,7 +3,6 @@ use std::time::Instant;
 
 
 const LIMIT: usize = 10000;
-const TEST_STR: &str = "HTTP/1.1 301 TLS Redirect\r\nDate: Fri, 21 Aug 2020 17:42:29 GMT\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nSet-Cookie: __cfduid=d1cd636ec4303be8a4ac9d8d01f93e1e71598031749; expires=Sun, 20-Sep-20 17:42:29 GMT; path=/; domain=.typicode.com; HttpOnly; SameSite=Lax\r\nX-Powered-By: Express\r\nX-Ratelimit-Limit: 1000\r\nX-Ratelimit-Remaining: 999\r\nX-Ratelimit-Reset: 1597842544\r\nVary: Origin, Accept-Encoding\r\nAccess-Control-Allow-Credentials: true\r\nCache-Control: max-age=43200\r\nPragma: no-cache\r\nExpires: -1\r\nX-Content-Type-Options: nosniff\r\nEtag: W/\"5ef7-4Ad6/n39KWY9q6Ykm/ULNQ2F5IM\"\r\nVia: 1.1 vegur\r\nCF-Cache-Status: HIT\r\nAge: 10212\r\ncf-request-id: 04b3b67aed0000e608b91e0200000001\r\nServer: cloudflare\r\nCF-RAY: 5c6626a4ad9ae608-LHR";
 
 #[test]
 fn test_get() {
@@ -31,8 +30,32 @@ fn test_request_builder_get() {
 #[test]
 fn bench_response_parsing() {
     bench("parse response", LIMIT, || {
-        let header_line = "HTTP/1.1 301 TLS Redirect\r\n".to_string();
-        let response = crate::structs::Response::new(String::from(TEST_STR), header_line);
+        let header_line: Vec<String> = vec!["HTTP/1.1 301 TLS Redirect\r\n".to_string()];
+        let test_body: Vec<String> = vec![
+            "HTTP/1.1 301 TLS Redirect\r\n".to_string(),
+            "Date: Fri, 21 Aug 2020 17:42:29 GMT\r\n".to_string(),
+            "Content-Type: application/json; charset=utf-8\r\n".to_string(),
+            "Connection: keep-alive\r\n".to_string(),
+            "Set-Cookie: __cfduid=d1cd636ec4303be8a4ac9d8d01f93e1e71598031749; expires=Sun, 20-Sep-20 17:42:29 GMT; path=/; domain=.typicode.com; HttpOnly; SameSite=Lax\r\n".to_string(),
+            "X-Powered-By: Express\r\n".to_string(),
+            "X-Ratelimit-Limit: 1000\r\n".to_string(),
+            "X-Ratelimit-Remaining: 999\r\n".to_string(),
+            "X-Ratelimit-Reset: 1597842544\r\n".to_string(),
+            "Vary: Origin, Accept-Encoding\r\n".to_string(),
+            "Access-Control-Allow-Credentials: true\r\n".to_string(),
+            "Cache-Control: max-age=43200\r\n".to_string(),
+            "Pragma: no-cache\r\n".to_string(),
+            "Expires: -1\r\n".to_string(),
+            "X-Content-Type-Options: nosniff\r\n".to_string(),
+            "Etag: W/\"5ef7-4Ad6/n39KWY9q6Ykm/ULNQ2F5IM\"\r\n".to_string(),
+            "Via: 1.1 vegur\r\n".to_string(),
+            "CF-Cache-Status: HIT\r\n".to_string(),
+            "Age: 10212\r\n".to_string(),
+            "cf-request-id: 04b3b67aed0000e608b91e0200000001\r\n".to_string(),
+            "Server: cloudflare\r\n".to_string(),
+            "CF-RAY: 5c6626a4ad9ae608-LHR".to_string()
+        ];
+        let response = crate::structs::Response::new(test_body.join(""), header_line);
     })
 }
 
@@ -40,7 +63,7 @@ fn bench_response_parsing() {
 fn bench_cookie_parsing() {
     let cookie = "Set-Cookie: has_recent_activity=1; path=/; expires=Fri, 21 Aug 2020 21:11:53 GMT; secure; HttpOnly; SameSite=Lax";
     bench("parse cookie", LIMIT, || {
-        let cookie = crate::utils::parse_cookie(cookie);
+        let cookie = crate::utils::parse_cookie(cookie.to_string());
     })
 }
 
@@ -48,7 +71,7 @@ fn bench_cookie_parsing() {
 fn bench_header_parsing() {
     let header = "Date: Fri, 21 Aug 2020 17:42:29 GMT";
     bench("parse header", LIMIT, || {
-        let header = crate::utils::parse_header(header);
+        let header = crate::utils::parse_header(header.to_string());
     })
 }
 

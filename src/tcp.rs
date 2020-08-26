@@ -1,9 +1,9 @@
 use std::net::TcpStream;
 use crate::structs::Response;
 use std::io::{Write, Read, BufReader, BufRead};
+use chunked_transfer::Decoder;
 
-
-pub fn get<S: Into<String>>(domain: S, path: S) {
+pub fn get<S: Into<String>>(domain: S, path: S) -> Response {
     let host = domain.into();
     let location = path.into();
 
@@ -15,43 +15,46 @@ pub fn get<S: Into<String>>(domain: S, path: S) {
     stream.flush().unwrap();
 
     let mut reader = BufReader::new(&mut stream);
-    let mut received: Vec<u8> = reader.fill_buf().unwrap().to_vec();
 
-    reader.consume(received.len());
-    let mut response = String::from_utf8(received.clone()).unwrap();
-    let mut lines = response.split("\r\n").collect::<Vec<&str>>().clone();
+    let mut head_line = String::new();
+    let mut lines: Vec<String> = Vec::new();
 
-    let head_line = lines.first().unwrap().clone().to_string();
+    reader.read_line(&mut head_line);
+    lines.push(head_line.clone());
 
-    let mut parsed_response: Response = Response::new(lines.join("\r\n").clone(), head_line.clone());
-    println!("{:#?}", parsed_response);
-
-    let mut passes = 0;
-
-    if parsed_response.chunk_size != None {
-        while parsed_response.chunk_size.clone().unwrap() > 0 && passes < 5{
-            println!("Chunk Size: {}", parsed_response.chunk_size.clone().unwrap());
-            let mut temp_buf = reader.fill_buf().unwrap().to_vec();
-            if temp_buf == received {
-                break;
-            }
-            // while temp_buf.len() < reader.buffer().len() {
-            //     temp_buf.extend(reader.fill_buf().unwrap().to_vec());
-            // }
-            reader.consume(temp_buf.len());
-
-            received.extend(temp_buf);
-
-            response = String::from_utf8(received.clone()).unwrap();
-
-            parsed_response = Response::new(response.clone(), head_line.clone());
-
-            passes += 1;
-        }
+    while lines.last().unwrap() != &String::from("\r\n") {
+        let mut buf_str = String::new();
+        reader.read_line(&mut buf_str);
+        lines.push(buf_str.clone())
     }
 
-    return ();
-    // return parsed_response;
+    lines.pop();
+
+    let head = lines;
+
+    lines = Vec::new();
+    lines.push("FIRST".to_string());
+
+    while lines.last().unwrap() != &String::from("\r\n") {
+        let mut buf_str = String::new();
+
+        reader.read_line(&mut buf_str);
+        lines.push(buf_str.clone())
+    }
+
+
+    let encoded = lines.join("");
+
+    let mut decoder = chunked_transfer::Decoder::new(encoded.as_bytes());
+
+    let mut response = String::new();
+    decoder.read_to_string(&mut response);
+
+    let mut parsed_response: Response = Response::new(response, head);
+
+    println!("{:#?}", parsed_response);
+
+    return parsed_response;
 }
 
 // last run got to id 43

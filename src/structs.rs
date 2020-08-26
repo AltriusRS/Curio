@@ -43,7 +43,6 @@ pub struct Response {
     pub cookies: HashMap<String, Cookie>,
     pub cookie_count: usize,
     pub body: Option<String>,
-    pub chunk_size: Option<i64>,
 }
 
 #[derive(Debug, Clone)]
@@ -71,8 +70,8 @@ pub struct WarpConfig {
 }
 
 impl Response {
-    pub fn new(raw: String, head_line: String /*config: WarpConfig*/) -> Response {
-        utils::new_response(raw, head_line)
+    pub fn new(body: String, head: Vec<String>) -> Response {
+        utils::new_response(body, head)
     }
 }
 
@@ -101,7 +100,7 @@ impl Request {
     }
 
 
-    pub fn send(&self) -> Result<(), Box<dyn Error>> {
+    pub fn send(&self) -> Result<Response, Box<dyn Error>> {
         return match self.protocol {
             HTTPVersion::HTTPS => {
                 println!("HTTPS is experimental, we recommend switching to HTTP");

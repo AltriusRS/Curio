@@ -2,7 +2,7 @@ use std::fmt::Write;
 use std::collections::HashMap;
 use crate::structs::{Cookie, Header, Response};
 
-pub fn parse_cookie(line: &str) -> Cookie {
+pub fn parse_cookie(line: String) -> Cookie {
     let mut formatted = line.split("Set-Cookie:").collect::<Vec<&str>>();
     let args = formatted.last().unwrap().split(';').collect::<Vec<&str>>();
     let mut parsed_args = HashMap::<String, String>::new();
@@ -85,7 +85,7 @@ pub fn parse_cookie(line: &str) -> Cookie {
     };
 }
 
-pub fn parse_header(line: &str) -> Header {
+pub fn parse_header(line: String) -> Header {
     let mut parsed_args = HashMap::<String, String>::new();
     let mut keypair = line.split(": ").collect::<Vec<&str>>();
     keypair.reverse();
@@ -99,14 +99,18 @@ pub fn parse_header(line: &str) -> Header {
     if key_name.len() == 1 as usize {
         key = key_name.last().unwrap().to_string();
     }
-    let value = keypair.join("=");
+    let mut value = keypair.join("=");
+    value = value.split("\r\n").collect::<Vec<&str>>().join("");
     return Header {
         name: Some(key),
         value: Some(value),
     };
 }
 
-pub fn new_response(raw: String, head_line: String) -> Response {
+pub fn new_response(mut body_text: String, mut head: Vec<String>) -> Response {
+    head.reverse();
+    let head_line = head.pop().unwrap();
+    head.reverse();
     let mut head_content: Vec<&str> = head_line.split_ascii_whitespace().collect();
     head_content.reverse();
     let protocol = head_content.pop().unwrap().to_owned();
@@ -114,51 +118,31 @@ pub fn new_response(raw: String, head_line: String) -> Response {
     head_content.reverse();
     let status_text = head_content.join(" ");
 
-    let lines = raw.split("\r\n").collect::<Vec<&str>>();
+
     let mut cookies = HashMap::<String, Cookie>::new();
     let mut headers = HashMap::<String, String>::new();
-    let mut is_body = false;
-    let mut body_lines = Vec::<&str>::new();
-    for line in lines {
-        if !line.starts_with("HTTP") {
-            if line.starts_with("Set-Cookie:") {
-                let cookie = parse_cookie(line);
-                cookies.insert(cookie.name.clone().unwrap(), cookie);
-            } else {
-                if line == "" && !is_body || line == "\n" && !is_body {
-                    is_body = true;
-                } else if is_body {
-                    body_lines.push(line);
-                } else {
-                    let header = parse_header(line);
-                    headers.insert(header.name.unwrap(), header.value.unwrap());
-                }
-            }
+
+    for line in head {
+        if line.starts_with("Set-Cookie:") {
+            let cookie = parse_cookie(line);
+            cookies.insert(cookie.name.clone().unwrap(), cookie);
+        } else {
+            let header = parse_header(line);
+            headers.insert(header.name.unwrap(), header.value.unwrap());
         }
     }
-
 
     let header_count = headers.len();
     let cookie_count = cookies.len();
 
-    let mut chunk_size: Option<i64> = None;
-    let encoding = headers.get("Transfer-Encoding");
-    if encoding != None {
-        if encoding.unwrap() == &String::from("chunked") {
-            body_lines.reverse();
-            chunk_size = Some(i64::from_str_radix(body_lines.pop().unwrap(), 16).unwrap());
-            body_lines.reverse();
-        }
-    }
-
     let mut body = None;
 
-    if body_lines.len() > 0 {
-        body = Some(body_lines.join("\n"))
+    if body_text.len() > 0 {
+        body = Some(body_text)
     }
 
     Response {
-        raw: raw.escape_default().to_string(),
+        raw: body.clone().unwrap_or(String::new()).escape_default().to_string(),
         protocol: Some(protocol),
         status: Some(status.parse::<isize>().unwrap()),
         status_text: Some(status_text),
@@ -167,6 +151,5 @@ pub fn new_response(raw: String, head_line: String) -> Response {
         headers,
         header_count,
         body,
-        chunk_size,
     }
 }
