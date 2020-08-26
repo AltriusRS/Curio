@@ -1,7 +1,7 @@
-mod tls;
-mod tcp;
-mod structs;
-mod utils;
+pub(crate) mod tls;
+pub(crate) mod tcp;
+pub(crate) mod structs;
+pub(crate) mod utils;
 
 #[cfg(test)]
 mod tests;

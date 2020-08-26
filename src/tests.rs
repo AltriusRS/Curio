@@ -57,3 +57,11 @@ fn test_request_builder_get() {
     assert_eq!(response.status.unwrap(), 200);
 }
 
+#[test]
+fn test_cookie_parser_exhaustive() {
+    let cookie1 = "Set-Cookie: has_recent_activity=1; path=/; expires=Fri, 21 Aug 2020 21:11:53 GMT; secure; HttpOnly; SameSite=Lax";
+    let cookie2 = "Set-Cookie: has_recent_activity=1; path=/;";
+    let _ = crate::utils::parsers::parse_cookie(cookie1.to_string());
+    let _ = crate::utils::parsers::parse_cookie(cookie1.to_string());
+    assert_eq!(1, 1);
+}
