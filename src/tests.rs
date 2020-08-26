@@ -6,7 +6,7 @@ const LIMIT: usize = 10000;
 
 #[test]
 fn test_get() {
-    let response = crate::tcp::get("jsonplaceholder.typicode.com", "/todos/");
+    let response = crate::tcp::get("apache.org", "/");
     assert_eq!(1, 1)
     //assert_eq!(response.status_text.unwrap(), String::from("OK"));
 }
@@ -21,7 +21,7 @@ fn test_request_builder() {
 
 #[test]
 fn test_request_builder_get() {
-    let response = crate::structs::Request::get("http://jsonplaceholder.typicode.com/todos/").send().unwrap();
+    let response = crate::structs::Request::get("http://www.apache.org/").send().unwrap();
 
     //println!("{:#?}", response);
     assert_eq!(1, 1);
