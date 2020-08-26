@@ -1,21 +1,21 @@
 #[allow(non_snake_case)]
 #[test]
 fn test_get() {
-    let response = crate::tcp::get("raw.githubusercontent.com", "/fatalcenturion/Curio/master/README.md");
+    let response = crate::tcp::get("raw.githubusercontent.com", "/fatalcenturion/Curio/master/README.md").unwrap();
     println!("{:#?}", response);
     assert_eq!(response.status.unwrap(), 200);
 }
 
 #[test]
 fn test_chunked_get() {
-    let response = crate::tcp::get("jsonplaceholder.typicode.com", "/todos/");
+    let response = crate::tcp::get("jsonplaceholder.typicode.com", "/todos/").unwrap();
     println!("{:#?}", response);
     assert_eq!(response.status.unwrap(), 200);
 }
 
 #[test]
 fn test_head() {
-    let response = crate::tcp::head("raw.githubusercontent.com", "/fatalcenturion/Curio/master/README.md");
+    let response = crate::tcp::head("raw.githubusercontent.com", "/fatalcenturion/Curio/master/README.md").unwrap();
     println!("{:#?}", response);
     assert_eq!(response.status.unwrap(), 200);
 }
@@ -44,7 +44,7 @@ fn test_tls_get() {
 
 #[test]
 fn test_tls_chunked_get() {
-    let response = crate::tls::get("jsonplaceholder.typicode.com", "/todos/", true);
+    let response = crate::tls::get("jsonplaceholder.typicode.com", "/todos/", true).unwrap();
     println!("{:#?}", response);
     assert_eq!(response.status.unwrap(), 200);
 }

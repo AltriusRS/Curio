@@ -52,3 +52,11 @@ pub fn new_response(mut body_text: String, mut head: Vec<String>) -> Response {
         warnings: Vec::new(),
     }
 }
+
+pub fn parse_err_reason(reason: String) -> crate::structs::errors::Error {
+    if reason == "Method not allowed".to_string() {
+        crate::structs::errors::Error::CrossOriginResourceMethodDisallowed
+    } else /*if reason == "Origin not allowed".to_string()*/ {
+        crate::structs::errors::Error::CrossOriginResourceOriginDisallowed
+    }
+}

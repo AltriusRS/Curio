@@ -1,7 +1,7 @@
 use crate::utils;
 use std::collections::HashMap;
 use std::error::Error;
-
+pub(crate) mod errors;
 #[derive(Debug, Clone)]
 pub enum RequestType {
     GET = 0,
@@ -116,25 +116,25 @@ impl Request {
     }
 
 
-    pub fn send(&self) -> Result<Response, Box<dyn Error>> {
+    pub fn send(&self) -> Result<Response,  self::errors::Error> {
         return match self.protocol {
             HTTPVersion::HTTPS => {
                 match self.request_type {
-                    RequestType::GET => Ok(crate::tls::get(&self.domain, &self.path, false)),
-                    RequestType::HEAD => Ok(crate::tls::head(&self.domain, &self.path, false)),
+                    RequestType::GET => crate::tls::get(&self.domain, &self.path, false),
+                    RequestType::HEAD => crate::tls::head(&self.domain, &self.path, false),
                     _ => {
                         println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
-                        Ok(crate::tcp::get(&self.domain, &self.path))
+                        crate::tcp::get(&self.domain, &self.path)
                     }
                 }
             }
             HTTPVersion::HTTP => {
                 match self.request_type {
-                    RequestType::GET => Ok(crate::tcp::get(&self.domain, &self.path)),
-                    RequestType::HEAD => Ok(crate::tcp::head(&self.domain, &self.path)),
+                    RequestType::GET => crate::tcp::get(&self.domain, &self.path),
+                    RequestType::HEAD => crate::tcp::head(&self.domain, &self.path),
                     _ => {
                         println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
-                        Ok(crate::tcp::get(&self.domain, &self.path))
+                        crate::tcp::get(&self.domain, &self.path)
                     }
                 }
             }
