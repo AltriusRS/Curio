@@ -6,22 +6,29 @@ const LIMIT: usize = 10000;
 
 #[test]
 fn test_get() {
-    let response = crate::tcp::get("apache.org", "/");
+    let response = crate::tcp::get("raw.githubusercontent.com", "/fatalcenturion/Curio/dev/README.md");
     assert_eq!(1, 1)
     //assert_eq!(response.status_text.unwrap(), String::from("OK"));
 }
 
 #[test]
 fn test_request_builder() {
-    let mut request = crate::structs::Request::get("https://github.com/Hexeption/Optifine-SRC/blob/master/Optifine%20SRC%20Version%20%5B1.10.2%20HD%20U%20C1%5D.rar");
+    let mut request = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/dev/README.md");
     request.set_header("header", "true");
     println!("{:#?}", request);
     assert_eq!(request.header_count, 1);
 }
 
 #[test]
+fn test_tls_get() {
+    let mut response = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/dev/README.md").send().unwrap();
+
+    assert_eq!(response.status.unwrap(), 200);
+}
+
+#[test]
 fn test_request_builder_get() {
-    let response = crate::structs::Request::get("http://www.apache.org/").send().unwrap();
+    let response = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/dev/README.md").send().unwrap();
 
     //println!("{:#?}", response);
     assert_eq!(1, 1);

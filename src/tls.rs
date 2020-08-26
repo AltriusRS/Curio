@@ -3,29 +3,75 @@ use rustls::{ClientConfig, ClientSession};
 use webpki_roots::TLS_SERVER_ROOTS;
 use webpki::*;
 use std::sync::Arc;
-use std::io::Write;
 use crate::structs::Response;
+use std::net::TcpStream;
+use std::io::{Write, Read, BufReader, BufRead};
+use std::str::FromStr;
 
 pub fn get<S: Into<String>>(domain: S, path: S) -> Response  {
-    let formatted_domain = domain.into();
-    let formatted_path = path.into();
+    let host = domain.into();
+    let location = path.into();
+
+    let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+
+    let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
     let config = Arc::new(build_tls_config());
-    let domain_ref = DNSNameRef::try_from_ascii_str(formatted_domain.as_str()).unwrap();
-    let mut client = ClientSession::new(&config, domain_ref);
-    let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", formatted_path, formatted_domain);
-    client.write_all(request.as_bytes()).unwrap();
-    
-    return Response {
-        raw: "".to_string(),
-        protocol: None,
-        status: None,
-        status_text: None,
-        headers: Default::default(),
-        header_count: 0,
-        cookies: Default::default(),
-        cookie_count: 0,
-        body: None,
+    let domain_ref = DNSNameRef::try_from_ascii_str(host.as_str()).unwrap();
+    let mut client: ClientSession = ClientSession::new(&config, domain_ref);
+    let mut stream = rustls::Stream::new(&mut client, &mut socket);
+    let mut reader = BufReader::new(&mut stream);
+
+    stream.write_all(request.as_bytes()).unwrap();
+
+    stream.flush().unwrap();
+
+    let mut reader = BufReader::new(&mut stream);
+
+    let mut head_line = String::new();
+    let mut lines: Vec<String> = Vec::new();
+
+    reader.read_line(&mut head_line);
+    lines.push(head_line.clone());
+
+    while lines.last().unwrap() != &String::from("\r\n") {
+        let mut buf_str = String::new();
+        reader.read_line(&mut buf_str);
+        lines.push(buf_str.clone())
     }
+
+    lines.pop();
+
+    let head = lines;
+    let mut parsed_response: Response = Response::new(String::new(), head.clone());
+    lines = Vec::new();
+    let mut response = String::new();
+
+    if !parsed_response.headers.contains_key("Content-Length") {
+        if parsed_response.headers.get("Transfer-Encoding").unwrap_or(&String::new()) == &String::from("chunked") {
+            while lines.last().unwrap_or(&String::from("")) != &String::from("\n") {
+                let mut buf_str = String::new();
+                reader.read_line(&mut buf_str);
+                lines.push(buf_str.clone());
+            }
+            let encoded = lines.join("");
+            let mut decoder = chunked_transfer::Decoder::new(encoded.as_bytes());
+            decoder.read_to_string(&mut response);
+        }
+    } else {
+        while response.len() < usize::from_str(parsed_response.headers.get("Content-Length").unwrap_or(&String::from("0")).as_str()).unwrap_or(0) {
+            let mut buf_str = String::new();
+            reader.read_line(&mut buf_str);
+            lines.push(buf_str.clone());
+            response = lines.join("");
+        }
+    }
+
+
+    parsed_response= Response::new(response, head);
+
+    println!("{:#?}", parsed_response);
+
+    return parsed_response;
 }
 
 fn build_tls_config() -> ClientConfig {

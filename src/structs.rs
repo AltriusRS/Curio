@@ -104,7 +104,7 @@ impl Request {
         return match self.protocol {
             HTTPVersion::HTTPS => {
                 println!("HTTPS is experimental, we recommend switching to HTTP");
-                Ok(crate::tcp::get(&self.domain, &self.path))
+                Ok(crate::tls::get(&self.domain, &self.path))
             }
             HTTPVersion::HTTP => {
                 Ok(crate::tcp::get(&self.domain, &self.path))
