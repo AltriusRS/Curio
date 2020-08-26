@@ -43,6 +43,7 @@ pub struct Response {
     pub cookies: HashMap<String, Cookie>,
     pub cookie_count: usize,
     pub body: Option<String>,
+    pub warnings: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -92,6 +93,21 @@ impl Request {
         }
     }
 
+    pub fn head<A: Into<String>>(url: A) -> Request {
+        let url_string = url.into();
+        let (protocol, domain, path) = parse_url(&url_string);
+
+        Request {
+            request_type: RequestType::HEAD,
+            url_string,
+            domain,
+            path,
+            protocol,
+            body: None,
+            headers: HashMap::<String, String>::new(),
+            header_count: 0,
+        }
+    }
 
     pub fn set_header<A: Into<String>>(&mut self, key: A, value: A) -> &mut Request {
         self.headers.insert(key.into(), value.into());
@@ -103,10 +119,24 @@ impl Request {
     pub fn send(&self) -> Result<Response, Box<dyn Error>> {
         return match self.protocol {
             HTTPVersion::HTTPS => {
-                Ok(crate::tls::get(&self.domain, &self.path))
+                match self.request_type {
+                    RequestType::GET => Ok(crate::tls::get(&self.domain, &self.path, false)),
+                    RequestType::HEAD => Ok(crate::tls::head(&self.domain, &self.path, false)),
+                    _ => {
+                        println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
+                        Ok(crate::tcp::get(&self.domain, &self.path))
+                    }
+                }
             }
             HTTPVersion::HTTP => {
-                Ok(crate::tcp::get(&self.domain, &self.path))
+                match self.request_type {
+                    RequestType::GET => Ok(crate::tcp::get(&self.domain, &self.path)),
+                    RequestType::HEAD => Ok(crate::tcp::head(&self.domain, &self.path)),
+                    _ => {
+                        println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
+                        Ok(crate::tcp::get(&self.domain, &self.path))
+                    }
+                }
             }
         };
     }
@@ -128,12 +158,3 @@ fn parse_url(url: &String) -> (HTTPVersion, String, String) {
     let path = format!("/{}", url_parts.join("/"));
     return (http, domain.to_string(), path);
 }
-
-
-/*
-_gh_sess=x%2BTaOlZG5bVHc9kULx%2BpFOJgxaijkxLJHa1HPIxYn88c7olgN45%2BBh2rihtNrthz4rxRTxLxmmOrOOsWRhuYp2dZ%2BCOMQpCwD8Rs%2B%2BCifosu9WSONeDFo7hPGlCRyuLRwBCnn6Kr2%2BguohpkxRVBDO%2BzXB9eWozYwNjfxMx1%2BJo%3D--FU4jGsR%2Bpgkw7StM--yV0CA%2FJZS7DcE11xeywLFA%3D%3D;
-path=/;
-secure;
-HttpOnly;
-SameSite=Lax
- */

@@ -8,7 +8,7 @@ use std::net::TcpStream;
 use std::io::{Write, Read, BufReader, BufRead};
 use std::str::FromStr;
 
-pub fn get<S: Into<String>>(domain: S, path: S) -> Response  {
+pub fn get<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Response  {
     let host = domain.into();
     let location = path.into();
 
@@ -68,9 +68,53 @@ pub fn get<S: Into<String>>(domain: S, path: S) -> Response  {
 
 
     parsed_response= Response::new(response, head);
-
+    if is_upgrade {
+        parsed_response.warnings.push(String::from("This request was automatically upgraded to HTTPS at the request of the server."));
+    }
     return parsed_response;
 }
+
+pub fn head<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Response  {
+    let host = domain.into();
+    let location = path.into();
+
+    let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+
+    let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
+    let config = Arc::new(build_tls_config());
+    let domain_ref = DNSNameRef::try_from_ascii_str(host.as_str()).unwrap();
+    let mut client: ClientSession = ClientSession::new(&config, domain_ref);
+    let mut stream = rustls::Stream::new(&mut client, &mut socket);
+    let mut reader = BufReader::new(&mut stream);
+
+    stream.write_all(request.as_bytes()).unwrap();
+
+    stream.flush().unwrap();
+
+    let mut reader = BufReader::new(&mut stream);
+
+    let mut head_line = String::new();
+    let mut lines: Vec<String> = Vec::new();
+
+    reader.read_line(&mut head_line);
+    lines.push(head_line.clone());
+
+    while lines.last().unwrap() != &String::from("\r\n") {
+        let mut buf_str = String::new();
+        reader.read_line(&mut buf_str);
+        lines.push(buf_str.clone())
+    }
+
+    lines.pop();
+
+    let head = lines;
+    let mut parsed_response: Response = Response::new(String::new(), head);
+    if is_upgrade {
+        parsed_response.warnings.push(String::from("This request was automatically upgraded to HTTPS at the request of the server."));
+    }
+    return parsed_response;
+}
+
 
 fn build_tls_config() -> ClientConfig {
     let mut cfg = ClientConfig::new();

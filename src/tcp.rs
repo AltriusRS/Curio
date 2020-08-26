@@ -56,9 +56,48 @@ pub fn get<S: Into<String>>(domain: S, path: S) -> Response {
         }
     }
 
+    if parsed_response.status.unwrap() == 301 && parsed_response.headers.get("Location").clone().unwrap().contains("https://") {
+        return crate::tls::get(host, location, true);
+    } else {
+        return parsed_response;
+    }
 
     parsed_response= Response::new(response, head);
     return parsed_response;
 }
 
-// last run got to id 43
+pub fn head<S: Into<String>>(domain: S, path: S) -> Response {
+    let host = domain.into();
+    let location = path.into();
+
+    let request = format!("HEAD {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+
+    let mut stream = TcpStream::connect(format!("{}:80", host)).unwrap();
+
+    stream.write_all(request.as_bytes()).unwrap();
+    stream.flush().unwrap();
+
+    let mut reader = BufReader::new(&mut stream);
+
+    let mut head_line = String::new();
+    let mut lines: Vec<String> = Vec::new();
+
+    reader.read_line(&mut head_line);
+    lines.push(head_line.clone());
+
+    while lines.last().unwrap() != &String::from("\r\n") {
+        let mut buf_str = String::new();
+        reader.read_line(&mut buf_str);
+        lines.push(buf_str.clone())
+    }
+
+    lines.pop();
+
+    let head = lines;
+    let mut parsed_response: Response = Response::new(String::new(), head.clone());
+    if parsed_response.status.unwrap() == 301 && parsed_response.headers.get("Location").clone().unwrap().contains("https://") {
+        return crate::tls::head(host, location, true);
+    } else {
+        return parsed_response;
+    }
+}

@@ -7,7 +7,7 @@ description = "A blazing fast http client"
 repository = "https://github.com/fatalcenturion/Curio"
 readme = "README.md"
 homepage = "https://github.com/fatalcenturion/Curio"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 keyworks = ["http", "client", "https", "open_source"]
 categories = ["network-programming", "web-programming::http-client"]
 
