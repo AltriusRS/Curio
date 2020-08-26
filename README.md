@@ -31,6 +31,12 @@ If I can find the time to add the feature then it might, but I have to split my 
 
 Currently this library is heavily under development and as such is completely nonfunctional. There are no docs to ensure nobody uses it in its current state other than the developer.
 
+
+# Milestones
+
+Wed 26th Aug 2020 - First fully capable GET request handler: [Commit 496ae5f](https://github.com/fatalcenturion/Curio/commit/496ae5f909b750638009bbdc4aa10760e801f731) 
+
+
 # Internal Benchmarks
 > Note: These benchmarks are for the internals of Curio, they are not comparable to any other http client.
 
