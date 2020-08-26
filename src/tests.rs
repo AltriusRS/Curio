@@ -22,7 +22,7 @@ fn test_head() {
 
 #[test]
 fn test_non_https_head() {
-    let response = crate::tcp::head("jsonplaceholder.typicode.com", "/todos/");
+    let response = crate::structs::Request::head("http://jsonplaceholder.typicode.com/todos/").send().unwrap();
     println!("{:#?}", response);
     assert_eq!(response.status.unwrap(), 200);
 }
@@ -87,6 +87,6 @@ fn test_cookie_parser_exhaustive() {
     let cookie1 = "Set-Cookie: has_recent_activity=1; path=/; expires=Fri, 21 Aug 2020 21:11:53 GMT; secure; HttpOnly; SameSite=Lax";
     let cookie2 = "Set-Cookie: has_recent_activity=1; path=/;";
     let _ = crate::utils::parsers::parse_cookie(cookie1.to_string());
-    let _ = crate::utils::parsers::parse_cookie(cookie1.to_string());
+    let _ = crate::utils::parsers::parse_cookie(cookie2.to_string());
     assert_eq!(1, 1);
 }
