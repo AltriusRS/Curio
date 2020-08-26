@@ -6,32 +6,27 @@ const LIMIT: usize = 10000;
 
 #[test]
 fn test_get() {
-    let response = crate::tcp::get("raw.githubusercontent.com", "/fatalcenturion/Curio/dev/README.md");
-    assert_eq!(1, 1)
-    //assert_eq!(response.status_text.unwrap(), String::from("OK"));
+    let response = crate::tcp::get("raw.githubusercontent.com", "/fatalcenturion/Curio/master/README.md");
+    assert_eq!(response.status.unwrap(), 301);
 }
 
 #[test]
 fn test_request_builder() {
-    let mut request = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/dev/README.md");
+    let mut request = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
     request.set_header("header", "true");
-    println!("{:#?}", request);
     assert_eq!(request.header_count, 1);
 }
 
 #[test]
 fn test_tls_get() {
-    let mut response = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/dev/README.md").send().unwrap();
-
+    let mut response = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md").send().unwrap();
     assert_eq!(response.status.unwrap(), 200);
 }
 
 #[test]
 fn test_request_builder_get() {
-    let response = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/dev/README.md").send().unwrap();
-
-    //println!("{:#?}", response);
-    assert_eq!(1, 1);
+    let response = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md").send().unwrap();
+    assert_eq!(response.status.unwrap(), 200);
 }
 
 #[test]
