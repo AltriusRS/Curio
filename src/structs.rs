@@ -103,7 +103,6 @@ impl Request {
     pub fn send(&self) -> Result<Response, Box<dyn Error>> {
         return match self.protocol {
             HTTPVersion::HTTPS => {
-                println!("HTTPS is experimental, we recommend switching to HTTP");
                 Ok(crate::tls::get(&self.domain, &self.path))
             }
             HTTPVersion::HTTP => {

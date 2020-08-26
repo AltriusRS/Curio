@@ -69,8 +69,6 @@ pub fn get<S: Into<String>>(domain: S, path: S) -> Response  {
 
     parsed_response= Response::new(response, head);
 
-    println!("{:#?}", parsed_response);
-
     return parsed_response;
 }
 
