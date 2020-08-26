@@ -8,10 +8,11 @@ use std::net::TcpStream;
 use std::io::{Write, Read, BufReader, BufRead};
 use std::str::FromStr;
 
-pub fn get<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Response  {
+pub fn get<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Response {
     let host = domain.into();
     let location = path.into();
-
+    let can_run = preflight(host.clone(), location.clone(), "HEAD".to_string());
+    println!("{}", can_run);
     let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
     let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
@@ -67,18 +68,60 @@ pub fn get<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Response  {
     }
 
 
-    parsed_response= Response::new(response, head);
+    parsed_response = Response::new(response, head);
     if is_upgrade {
         parsed_response.warnings.push(String::from("This request was automatically upgraded to HTTPS at the request of the server."));
     }
     return parsed_response;
 }
 
-pub fn head<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Response  {
+pub fn head<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Response {
+    let host = domain.into();
+    let location = path.into();
+    let can_run = preflight(host.clone(), location.clone(), "HEAD".to_string());
+    println!("{}", can_run);
+    let request = format!("HEAD {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+
+    let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
+    let config = Arc::new(build_tls_config());
+    let domain_ref = DNSNameRef::try_from_ascii_str(host.as_str()).unwrap();
+    let mut client: ClientSession = ClientSession::new(&config, domain_ref);
+    let mut stream = rustls::Stream::new(&mut client, &mut socket);
+    let mut reader = BufReader::new(&mut stream);
+
+    stream.write_all(request.as_bytes()).unwrap();
+
+    stream.flush().unwrap();
+
+    let mut reader = BufReader::new(&mut stream);
+
+    let mut head_line = String::new();
+    let mut lines: Vec<String> = Vec::new();
+
+    reader.read_line(&mut head_line);
+    lines.push(head_line.clone());
+
+    while lines.last().unwrap() != &String::from("\r\n") {
+        let mut buf_str = String::new();
+        reader.read_line(&mut buf_str);
+        lines.push(buf_str.clone())
+    }
+
+    lines.pop();
+
+    let head = lines;
+    let mut parsed_response: Response = Response::new(String::new(), head);
+    if is_upgrade {
+        parsed_response.warnings.push(String::from("This request was automatically upgraded to HTTPS at the request of the server."));
+    }
+    return parsed_response;
+}
+
+pub fn options<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Response {
     let host = domain.into();
     let location = path.into();
 
-    let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+    let request = format!("OPTIONS {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
     let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
     let config = Arc::new(build_tls_config());
@@ -120,4 +163,45 @@ fn build_tls_config() -> ClientConfig {
     let mut cfg = ClientConfig::new();
     cfg.root_store.add_server_trust_anchors(&TLS_SERVER_ROOTS);
     cfg
+}
+
+fn preflight<S: Into<String>>(domain: S, path: S, method: S) -> bool {
+    let inv_head = "INVALID_HEADER".to_string();
+    let res = self::options(domain.into(), path.into(), false);
+    // access control origin
+    let acao = res.headers.get("Access-Control-Allow-Origin").clone().unwrap_or(&inv_head);
+    // access control methods
+    let mut acm = res.headers.get("Access-Control-Allow-Methods").clone().unwrap_or(&inv_head);
+    if acm == &inv_head {
+        acm = res.headers.get("Allow").clone().unwrap_or(&inv_head);
+    }
+    println!("Access-Control-Allow-Origin: {}\nAccess-Control-Allow-Methods: {}", acao, acm);
+
+    return if acao != &inv_head && acm != &inv_head {
+        if acm.contains(method.into().to_ascii_uppercase().as_str()) {
+            if acao == &String::from("*") {
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    } else {
+        if acao == &inv_head {
+            if acm.contains(method.into().to_ascii_uppercase().as_str()) {
+                true
+            } else {
+                false
+            }
+        } else if acm == &inv_head {
+            if acao == &String::from("*") {
+                true
+            } else {
+                false
+            }
+        } else {
+            true
+        }
+    };
 }

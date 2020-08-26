@@ -126,8 +126,7 @@ pub fn options<S: Into<String>>(domain: S, path: S) -> Response {
     let head = lines;
     let mut parsed_response: Response = Response::new(String::new(), head.clone());
     return if parsed_response.status.unwrap() == 301 && parsed_response.headers.get("Location").clone().unwrap().contains("https://") {
-        parsed_response
-        //crate::tls::options(host, location, true)
+        crate::tls::options(host, location, true)
     } else {
         parsed_response
     };
@@ -140,8 +139,10 @@ fn preflight<S: Into<String>>(domain: S, path: S, method: S) -> bool {
     // access control origin
     let acao = res.headers.get("Access-Control-Allow-Origin").clone().unwrap_or(&inv_head);
     // access control methods
-    let acm = res.headers.get("Access-Control-Allow-Methods").clone().unwrap_or(&inv_head);
-
+    let mut acm = res.headers.get("Access-Control-Allow-Methods").clone().unwrap_or(&inv_head);
+    if acm == &inv_head {
+        acm = res.headers.get("Allow").clone().unwrap_or(&inv_head);
+    }
     println!("Access-Control-Allow-Origin: {}\nAccess-Control-Allow-Methods: {}", acao, acm);
 
     return if acao != &inv_head && acm != &inv_head {
