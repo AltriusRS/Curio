@@ -7,6 +7,8 @@ use std::str::FromStr;
 pub fn get<S: Into<String>>(domain: S, path: S) -> Response {
     let host = domain.into();
     let location = path.into();
+    let can_run = preflight(host.clone(), location.clone(), "GET".to_string());
+    println!("{}", can_run);
 
     let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
@@ -47,13 +49,6 @@ pub fn get<S: Into<String>>(domain: S, path: S) -> Response {
             let mut decoder = Decoder::new(encoded.as_bytes());
             decoder.read_to_string(&mut response);
         }
-    } else {
-        while response.len() < usize::from_str(parsed_response.headers.get("Content-Length").unwrap_or(&String::from("0")).as_str()).unwrap_or(0) {
-            let mut buf_str = String::new();
-            reader.read_line(&mut buf_str);
-            lines.push(buf_str.clone());
-            response = lines.join("");
-        }
     }
 
     return if parsed_response.status.unwrap() == 301 && parsed_response.headers.get("Location").clone().unwrap().contains("https://") {
@@ -67,7 +62,8 @@ pub fn get<S: Into<String>>(domain: S, path: S) -> Response {
 pub fn head<S: Into<String>>(domain: S, path: S) -> Response {
     let host = domain.into();
     let location = path.into();
-    let _can_run = preflight(host.clone(), location.clone(), "HEAD".to_string());
+    let can_run = preflight(host.clone(), location.clone(), "HEAD".to_string());
+    println!("{}", can_run);
     let request = format!("HEAD {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
     let mut stream = TcpStream::connect(format!("{}:80", host)).unwrap();
@@ -146,7 +142,7 @@ fn preflight<S: Into<String>>(domain: S, path: S, method: S) -> bool {
     // access control methods
     let acm = res.headers.get("Access-Control-Allow-Methods").clone().unwrap_or(&inv_head);
 
-    println!("{}\n{}", acao, acm);
+    println!("Access-Control-Allow-Origin: {}\nAccess-Control-Allow-Methods: {}", acao, acm);
 
     return if acao != &inv_head && acm != &inv_head {
         if acm.contains(method.into().to_ascii_uppercase().as_str()) {
@@ -159,6 +155,20 @@ fn preflight<S: Into<String>>(domain: S, path: S, method: S) -> bool {
             false
         }
     } else {
-        true
+        if acao == &inv_head {
+            if acm.contains(method.into().to_ascii_uppercase().as_str()) {
+                true
+            } else {
+                false
+            }
+        } else if acm == &inv_head {
+            if acao == &String::from("*") {
+                true
+            } else {
+                false
+            }
+        } else {
+            true
+        }
     };
 }

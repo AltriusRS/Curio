@@ -21,6 +21,13 @@ fn test_head() {
 }
 
 #[test]
+fn test_non_https_head() {
+    let response = crate::tcp::head("jsonplaceholder.typicode.com", "/todos/");
+    println!("{:#?}", response);
+    assert_eq!(response.status.unwrap(), 200);
+}
+
+#[test]
 fn test_request_builder() {
     let mut request = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
     request.set_header("header", "true");
@@ -46,6 +53,24 @@ fn test_tls_chunked_get() {
 #[test]
 fn test_tls_head() {
     let mut response = crate::structs::Request::head("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md").send().unwrap();
+    println!("{:#?}", response);
+    assert_eq!(response.status.unwrap(), 200);
+}
+
+#[test]
+fn test_tcp_delete() {
+    let mut request = crate::structs::Request::get("http://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
+    request.request_type = crate::structs::RequestType::DELETE;
+    let response = request.send().unwrap();
+    println!("{:#?}", response);
+    assert_eq!(response.status.unwrap(), 200);
+}
+
+#[test]
+fn test_tls_delete() {
+    let mut request = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
+    request.request_type = crate::structs::RequestType::DELETE;
+    let response = request.send().unwrap();
     println!("{:#?}", response);
     assert_eq!(response.status.unwrap(), 200);
 }
