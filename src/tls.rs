@@ -134,7 +134,6 @@ pub fn post<S: Into<String>>(domain: S, path: S, request_struct: Request, is_upg
             }
         }
 
-
         parsed_response = Response::new(response, head);
         if is_upgrade {
             parsed_response.warnings.push(String::from("This request was automatically upgraded to HTTPS at the request of the server."));
