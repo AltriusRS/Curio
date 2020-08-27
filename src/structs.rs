@@ -1,7 +1,11 @@
 use crate::utils;
 use std::collections::HashMap;
 use std::error::Error;
+use crate::utils::parsers;
+use std::collections::hash_map::RandomState;
+
 pub(crate) mod errors;
+
 #[derive(Debug, Clone)]
 pub enum RequestType {
     GET = 0,
@@ -27,8 +31,22 @@ pub struct Request {
     pub path: String,
     pub protocol: HTTPVersion,
     pub body: Option<String>,
+    //Option<PostData<K, V>>,
     pub headers: HashMap<String, String>,
     pub header_count: usize,
+}
+
+#[derive(Debug, Clone)]
+pub enum BodyType {
+    MULTIPART = 0,
+    PLAINTEXT = 1,
+}
+
+#[derive(Debug, Clone)]
+pub struct PostData<K, V, S = RandomState> {
+    pub method: BodyType,
+    pub raw: String,
+    pub kv_store: HashMap<K, V, S>,
 }
 
 #[derive(Debug, Clone)]
@@ -79,7 +97,7 @@ impl Response {
 impl Request {
     pub fn get<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parse_url(&url_string);
+        let (protocol, domain, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::GET,
@@ -95,10 +113,42 @@ impl Request {
 
     pub fn head<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parse_url(&url_string);
+        let (protocol, domain, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::HEAD,
+            url_string,
+            domain,
+            path,
+            protocol,
+            body: None,
+            headers: HashMap::<String, String>::new(),
+            header_count: 0,
+        }
+    }
+
+    pub fn delete<A: Into<String>>(url: A) -> Request {
+        let url_string = url.into();
+        let (protocol, domain, path) = parsers::parse_url(&url_string);
+
+        Request {
+            request_type: RequestType::DELETE,
+            url_string,
+            domain,
+            path,
+            protocol,
+            body: None,
+            headers: HashMap::<String, String>::new(),
+            header_count: 0,
+        }
+    }
+
+    pub fn options<A: Into<String>>(url: A) -> Request {
+        let url_string = url.into();
+        let (protocol, domain, path) = parsers::parse_url(&url_string);
+
+        Request {
+            request_type: RequestType::OPTIONS,
             url_string,
             domain,
             path,
@@ -116,12 +166,14 @@ impl Request {
     }
 
 
-    pub fn send(&self) -> Result<Response,  self::errors::Error> {
+    pub fn send(&self) -> Result<Response, self::errors::Error> {
         return match self.protocol {
             HTTPVersion::HTTPS => {
                 match self.request_type {
                     RequestType::GET => crate::tls::get(&self.domain, &self.path, false),
                     RequestType::HEAD => crate::tls::head(&self.domain, &self.path, false),
+                    RequestType::OPTIONS => crate::tls::options(&self.domain, &self.path, false),
+                    RequestType::DELETE => crate::tls::delete(&self.domain, &self.path, false),
                     _ => {
                         println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
                         crate::tcp::get(&self.domain, &self.path)
@@ -132,6 +184,8 @@ impl Request {
                 match self.request_type {
                     RequestType::GET => crate::tcp::get(&self.domain, &self.path),
                     RequestType::HEAD => crate::tcp::head(&self.domain, &self.path),
+                    RequestType::OPTIONS => crate::tcp::options(&self.domain, &self.path),
+                    RequestType::DELETE => crate::tcp::delete(&self.domain, &self.path),
                     _ => {
                         println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
                         crate::tcp::get(&self.domain, &self.path)
@@ -142,19 +196,43 @@ impl Request {
     }
 }
 
-fn parse_url(url: &String) -> (HTTPVersion, String, String) {
-    let mut http = HTTPVersion::HTTP;
-    if url.contains("https") {
-        http = HTTPVersion::HTTPS;
-    }
-    let protless_url_vec = url.split(r"/^(?:https?:\/\/)/igm").collect::<Vec<&str>>();
-    let protless_url = protless_url_vec.last().unwrap();
-    let mut url_parts = protless_url.split("/").collect::<Vec<&str>>();
-    url_parts.reverse();
-    url_parts.pop();
-    url_parts.pop();
-    let domain = url_parts.pop().unwrap();
-    url_parts.reverse();
-    let path = format!("/{}", url_parts.join("/"));
-    return (http, domain.to_string(), path);
-}
+// impl PostData<K, V, S> {
+//     pub fn get<Q: Sized>(&self, k: Q) -> Option<&V> {
+//         return self.kv_store.get(k);
+//     }
+//
+//     pub fn insert<Q: Sized>(&mut self, k: K, v: V) -> usize {
+//         self.kv_store.insert(k, v);
+//         return self.kv_store.len();
+//     }
+//
+//     pub fn from_str<S: Into<String>>(str: S) -> PostData<String, String> {
+//         PostData {
+//             method: BodyType::PLAINTEXT,
+//             raw: str.into(),
+//             kv_store: HashMap::<String, String>::new(),
+//         }
+//     }
+//
+//     pub fn from_tuple<K: Sized, V: Sized>(data: Vec<(K, V)>) -> PostData<K, V> {
+//         let mut sl = PostData {
+//             method: BodyType::MULTIPART,
+//             raw: "".to_string(),
+//             kv_store: HashMap::<K, V>::new(),
+//         };
+//
+//         for (key, value) in data {
+//             sl.kv_store.insert(key, value);
+//         }
+//
+//         return sl;
+//     }
+//
+//     pub fn from_json<K: Sized, V: Sized>(map: HashMap<K, V>) -> PostData<K, V> {
+//         PostData {
+//             method: BodyType::MULTIPART,
+//             raw: "".to_string(),
+//             kv_store: map.clone()
+//         }
+//     }
+// }

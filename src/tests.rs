@@ -59,20 +59,36 @@ fn test_tls_head() {
 
 #[test]
 fn test_tcp_delete() {
-    let mut request = crate::structs::Request::get("http://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
+    let mut request = crate::structs::Request::delete("http://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
     request.request_type = crate::structs::RequestType::DELETE;
     let response = request.send().unwrap();
     println!("{:#?}", response);
-    assert_eq!(response.status.unwrap(), 200);
+    assert_eq!(response.status.unwrap(), 403);
 }
 
 #[test]
 fn test_tls_delete() {
-    let mut request = crate::structs::Request::get("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
+    let mut request = crate::structs::Request::delete("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
     request.request_type = crate::structs::RequestType::DELETE;
     let response = request.send().unwrap();
     println!("{:#?}", response);
-    assert_eq!(response.status.unwrap(), 200);
+    assert_eq!(response.status.unwrap(), 403);
+}
+
+#[test]
+fn test_tcp_options() {
+    let mut request = crate::structs::Request::options("http://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
+    let response = request.send().unwrap();
+    println!("{:#?}", response);
+    assert_eq!(response.status.unwrap(), 403);
+}
+
+#[test]
+fn test_tls_options() {
+    let mut request = crate::structs::Request::options("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
+    let response = request.send().unwrap();
+    println!("{:#?}", response);
+    assert_eq!(response.status.unwrap(), 403);
 }
 
 #[test]

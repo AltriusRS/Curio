@@ -1,5 +1,5 @@
 //use crate::structs::Response;
-use rustls::{ClientConfig, ClientSession};
+use rustls::{ClientConfig, ClientSession, Stream};
 use webpki_roots::TLS_SERVER_ROOTS;
 use webpki::*;
 use std::sync::Arc;
@@ -20,10 +20,8 @@ pub fn get<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<Resp
         let domain_ref = DNSNameRef::try_from_ascii_str(host.as_str()).unwrap();
         let mut client: ClientSession = ClientSession::new(&config, domain_ref);
         let mut stream = rustls::Stream::new(&mut client, &mut socket);
-        let mut reader = BufReader::new(&mut stream);
 
         stream.write_all(request.as_bytes()).unwrap();
-
         stream.flush().unwrap();
 
         let mut reader = BufReader::new(&mut stream);
@@ -78,22 +76,21 @@ pub fn get<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<Resp
     };
 }
 
-pub fn head<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<Response, crate::structs::errors::Error> {
+pub fn delete<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<Response, crate::structs::errors::Error> {
     let host = domain.into();
     let location = path.into();
     let (can_run, reason) = preflight(host.clone(), location.clone(), "HEAD".to_string());
     return if can_run {
-        let request = format!("HEAD {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+        let request = format!("DELETE {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+
 
         let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
         let config = Arc::new(build_tls_config());
         let domain_ref = DNSNameRef::try_from_ascii_str(host.as_str()).unwrap();
         let mut client: ClientSession = ClientSession::new(&config, domain_ref);
         let mut stream = rustls::Stream::new(&mut client, &mut socket);
-        let mut reader = BufReader::new(&mut stream);
 
         stream.write_all(request.as_bytes()).unwrap();
-
         stream.flush().unwrap();
 
         let mut reader = BufReader::new(&mut stream);
@@ -123,7 +120,51 @@ pub fn head<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<Res
     };
 }
 
-pub fn options<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Response {
+
+pub fn head<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<Response, crate::structs::errors::Error> {
+    let host = domain.into();
+    let location = path.into();
+    let (can_run, reason) = preflight(host.clone(), location.clone(), "HEAD".to_string());
+    return if can_run {
+        let request = format!("HEAD {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+
+        let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
+        let config = Arc::new(build_tls_config());
+        let domain_ref = DNSNameRef::try_from_ascii_str(host.as_str()).unwrap();
+        let mut client: ClientSession = ClientSession::new(&config, domain_ref);
+        let mut stream = rustls::Stream::new(&mut client, &mut socket);
+
+        stream.write_all(request.as_bytes()).unwrap();
+        stream.flush().unwrap();
+
+        let mut reader = BufReader::new(&mut stream);
+
+        let mut head_line = String::new();
+        let mut lines: Vec<String> = Vec::new();
+
+        reader.read_line(&mut head_line);
+        lines.push(head_line.clone());
+
+        while lines.last().unwrap() != &String::from("\r\n") {
+            let mut buf_str = String::new();
+            reader.read_line(&mut buf_str);
+            lines.push(buf_str.clone())
+        }
+
+        lines.pop();
+
+        let head = lines;
+        let mut parsed_response: Response = Response::new(String::new(), head);
+        if is_upgrade {
+            parsed_response.warnings.push(String::from("This request was automatically upgraded to HTTPS at the request of the server."));
+        }
+        Ok(parsed_response)
+    } else {
+        Err(crate::utils::parse_err_reason(reason.unwrap()))
+    };
+}
+
+pub fn options<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<Response, crate::structs::errors::Error> {
     let host = domain.into();
     let location = path.into();
 
@@ -134,10 +175,8 @@ pub fn options<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Respons
     let domain_ref = DNSNameRef::try_from_ascii_str(host.as_str()).unwrap();
     let mut client: ClientSession = ClientSession::new(&config, domain_ref);
     let mut stream = rustls::Stream::new(&mut client, &mut socket);
-    let mut reader = BufReader::new(&mut stream);
 
     stream.write_all(request.as_bytes()).unwrap();
-
     stream.flush().unwrap();
 
     let mut reader = BufReader::new(&mut stream);
@@ -161,7 +200,7 @@ pub fn options<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Respons
     if is_upgrade {
         parsed_response.warnings.push(String::from("This request was automatically upgraded to HTTPS at the request of the server."));
     }
-    return parsed_response;
+    Ok(parsed_response)
 }
 
 
@@ -173,7 +212,7 @@ fn build_tls_config() -> ClientConfig {
 
 fn preflight<S: Into<String>>(domain: S, path: S, method: S) -> (bool, Option<String>) {
     let inv_head = "INVALID_HEADER".to_string();
-    let res = self::options(domain.into(), path.into(), false);
+    let res = self::options(domain.into(), path.into(), false).unwrap();
     // access control origin
     let acao = res.headers.get("Access-Control-Allow-Origin").clone().unwrap_or(&inv_head);
     // access control methods

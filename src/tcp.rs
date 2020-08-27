@@ -60,8 +60,50 @@ pub fn get<S: Into<String>>(domain: S, path: S) -> Result<Response, crate::struc
         }
     } else {
         Err(crate::utils::parse_err_reason(reason.unwrap()))
-    }
+    };
 }
+
+pub fn delete<S: Into<String>>(domain: S, path: S) -> Result<Response, crate::structs::errors::Error> {
+    let host = domain.into();
+    let location = path.into();
+    let (can_run, reason) = preflight(host.clone(), location.clone(), "HEAD".to_string());
+    return if can_run {
+        let request = format!("DELETE {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+
+
+        let mut stream = TcpStream::connect(format!("{}:80", host)).unwrap();
+
+        stream.write_all(request.as_bytes()).unwrap();
+        stream.flush().unwrap();
+
+        let mut reader = BufReader::new(&mut stream);
+
+        let mut head_line = String::new();
+        let mut lines: Vec<String> = Vec::new();
+
+        reader.read_line(&mut head_line);
+        lines.push(head_line.clone());
+
+        while lines.last().unwrap() != &String::from("\r\n") {
+            let mut buf_str = String::new();
+            reader.read_line(&mut buf_str);
+            lines.push(buf_str.clone())
+        }
+
+        lines.pop();
+
+        let head = lines;
+        let mut parsed_response: Response = Response::new(String::new(), head);
+        if parsed_response.status.unwrap() == 301 && parsed_response.headers.get("Location").clone().unwrap().contains("https://") {
+            crate::tls::delete(host, location, true)
+        } else {
+            Ok(parsed_response)
+        }
+    } else {
+        Err(crate::utils::parse_err_reason(reason.unwrap()))
+    };
+}
+
 
 pub fn head<S: Into<String>>(domain: S, path: S) -> Result<Response, crate::structs::errors::Error> {
     let host = domain.into();
@@ -100,10 +142,10 @@ pub fn head<S: Into<String>>(domain: S, path: S) -> Result<Response, crate::stru
         }
     } else {
         Err(crate::utils::parse_err_reason(reason.unwrap()))
-    }
+    };
 }
 
-pub fn options<S: Into<String>>(domain: S, path: S) -> Response {
+pub fn options<S: Into<String>>(domain: S, path: S) -> Result<Response, crate::structs::errors::Error> {
     let host = domain.into();
     let location = path.into();
 
@@ -135,14 +177,14 @@ pub fn options<S: Into<String>>(domain: S, path: S) -> Response {
     return if parsed_response.status.unwrap() == 301 && parsed_response.headers.get("Location").clone().unwrap().contains("https://") {
         crate::tls::options(host, location, true)
     } else {
-        parsed_response
+        Ok(parsed_response)
     };
 }
 
 
 fn preflight<S: Into<String>>(domain: S, path: S, method: S) -> (bool, Option<String>) {
     let inv_head = "INVALID_HEADER".to_string();
-    let res = self::options(domain.into(), path.into());
+    let res = self::options(domain.into(), path.into()).unwrap();
     // access control origin
     let acao = res.headers.get("Access-Control-Allow-Origin").clone().unwrap_or(&inv_head);
     // access control methods
