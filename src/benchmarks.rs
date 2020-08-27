@@ -32,7 +32,7 @@ fn bench_response_parsing() {
             "Server: cloudflare\r\n".to_string(),
             "CF-RAY: 5c6626a4ad9ae608-LHR".to_string()
         ];
-        let response = crate::structs::Response::new(test_body.join(""), header_line);
+        crate::structs::Response::new(test_body.join(""), header_line);
     })
 }
 
@@ -40,7 +40,7 @@ fn bench_response_parsing() {
 fn bench_cookie_parsing() {
     let cookie = "Set-Cookie: has_recent_activity=1; path=/; expires=Fri, 21 Aug 2020 21:11:53 GMT; secure; HttpOnly; SameSite=Lax";
     bench("parse cookie", LIMIT, || {
-        let cookie = crate::utils::parsers::parse_cookie(cookie.to_string());
+        crate::utils::parsers::parse_cookie(cookie.to_string());
     })
 }
 
@@ -48,7 +48,7 @@ fn bench_cookie_parsing() {
 fn bench_header_parsing() {
     let header = "Date: Fri, 21 Aug 2020 17:42:29 GMT";
     bench("parse header", LIMIT, || {
-        let header = crate::utils::parsers::parse_header(header.to_string());
+        crate::utils::parsers::parse_header(header.to_string());
     })
 }
 

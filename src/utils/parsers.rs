@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::structs::{Cookie, Header, HTTPVersion};
 
 pub fn parse_cookie(line: String) -> Cookie {
-    let mut formatted = line.split("Set-Cookie:").collect::<Vec<&str>>();
+    let formatted = line.split("Set-Cookie:").collect::<Vec<&str>>();
     let args = formatted.last().unwrap().split(';').collect::<Vec<&str>>();
     let mut parsed_args = HashMap::<String, String>::new();
     for arg in &args {
@@ -56,11 +56,11 @@ pub fn parse_cookie(line: String) -> Cookie {
         None => None,
     };
     let http_only = match parsed_args.get("HttpOnly") {
-        Some(x) => true,
+        Some(_) => true,
         None => false,
     };
     let secure = match parsed_args.get("secure") {
-        Some(x) => true,
+        Some(_) => true,
         None => false,
     };
 
@@ -78,10 +78,9 @@ pub fn parse_cookie(line: String) -> Cookie {
 }
 
 pub fn parse_header(line: String) -> Header {
-    let mut parsed_args = HashMap::<String, String>::new();
     let mut keypair = line.split(": ").collect::<Vec<&str>>();
     keypair.reverse();
-    let mut key_name = keypair.pop().unwrap().split(" ").collect::<Vec<&str>>();
+    let key_name = keypair.pop().unwrap().split(" ").collect::<Vec<&str>>();
     let mut key: String = key_name.join(" ");
     if key_name.len() == 1 as usize {
         key = key_name.last().unwrap().to_string();

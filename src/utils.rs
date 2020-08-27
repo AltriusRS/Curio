@@ -5,7 +5,7 @@ pub(crate) mod parsers;
 
 use parsers::*;
 
-pub fn new_response(mut body_text: String, mut head: Vec<String>) -> Response {
+pub fn new_response(body_text: String, mut head: Vec<String>) -> Response {
     head.reverse();
     let head_line = head.pop().unwrap();
     head.reverse();

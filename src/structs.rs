@@ -1,8 +1,6 @@
 use crate::utils;
 use std::collections::HashMap;
-use std::error::Error;
 use crate::utils::parsers;
-use std::collections::hash_map::RandomState;
 
 pub(crate) mod errors;
 
@@ -30,7 +28,7 @@ pub struct Request {
     pub domain: String,
     pub path: String,
     pub protocol: HTTPVersion,
-    pub body: Option<String>,
+    pub body: Option<(String, String)>,
     //Option<PostData<K, V>>,
     pub headers: HashMap<String, String>,
     pub header_count: usize,
@@ -43,10 +41,10 @@ pub enum BodyType {
 }
 
 #[derive(Debug, Clone)]
-pub struct PostData<K, V, S = RandomState> {
+pub struct PostData {
     pub method: BodyType,
     pub raw: String,
-    pub kv_store: HashMap<K, V, S>,
+    pub kv_store: HashMap<String, String>,
 }
 
 #[derive(Debug, Clone)]
@@ -159,6 +157,27 @@ impl Request {
         }
     }
 
+    pub fn post<A: Into<String>>(url: A) -> Request {
+        let url_string = url.into();
+        let (protocol, domain, path) = parsers::parse_url(&url_string);
+
+        Request {
+            request_type: RequestType::POST,
+            url_string,
+            domain,
+            path,
+            protocol,
+            body: None,
+            headers: HashMap::<String, String>::new(),
+            header_count: 0,
+        }
+    }
+
+    pub fn set_body(&mut self, body: &PostData) -> &mut Request {
+        self.body = Some(body.deserialize());
+        self
+    }
+
     pub fn set_header<A: Into<String>>(&mut self, key: A, value: A) -> &mut Request {
         self.headers.insert(key.into(), value.into());
         self.header_count += 1;
@@ -166,7 +185,7 @@ impl Request {
     }
 
 
-    pub fn send(&self) -> Result<Response, self::errors::Error> {
+    pub fn send(&self) -> Result<Response, Box<dyn std::error::Error>> {
         return match self.protocol {
             HTTPVersion::HTTPS => {
                 match self.request_type {
@@ -174,6 +193,7 @@ impl Request {
                     RequestType::HEAD => crate::tls::head(&self.domain, &self.path, false),
                     RequestType::OPTIONS => crate::tls::options(&self.domain, &self.path, false),
                     RequestType::DELETE => crate::tls::delete(&self.domain, &self.path, false),
+                    RequestType::POST => crate::tls::post(&self.domain, &self.path, self.clone(), false),
                     _ => {
                         println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
                         crate::tcp::get(&self.domain, &self.path)
@@ -186,6 +206,7 @@ impl Request {
                     RequestType::HEAD => crate::tcp::head(&self.domain, &self.path),
                     RequestType::OPTIONS => crate::tcp::options(&self.domain, &self.path),
                     RequestType::DELETE => crate::tcp::delete(&self.domain, &self.path),
+                    RequestType::POST => crate::tcp::post(&self.domain, &self.path, self.clone()),
                     _ => {
                         println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
                         crate::tcp::get(&self.domain, &self.path)
@@ -196,43 +217,67 @@ impl Request {
     }
 }
 
-// impl PostData<K, V, S> {
-//     pub fn get<Q: Sized>(&self, k: Q) -> Option<&V> {
-//         return self.kv_store.get(k);
-//     }
-//
-//     pub fn insert<Q: Sized>(&mut self, k: K, v: V) -> usize {
-//         self.kv_store.insert(k, v);
-//         return self.kv_store.len();
-//     }
-//
-//     pub fn from_str<S: Into<String>>(str: S) -> PostData<String, String> {
-//         PostData {
-//             method: BodyType::PLAINTEXT,
-//             raw: str.into(),
-//             kv_store: HashMap::<String, String>::new(),
-//         }
-//     }
-//
-//     pub fn from_tuple<K: Sized, V: Sized>(data: Vec<(K, V)>) -> PostData<K, V> {
-//         let mut sl = PostData {
-//             method: BodyType::MULTIPART,
-//             raw: "".to_string(),
-//             kv_store: HashMap::<K, V>::new(),
-//         };
-//
-//         for (key, value) in data {
-//             sl.kv_store.insert(key, value);
-//         }
-//
-//         return sl;
-//     }
-//
-//     pub fn from_json<K: Sized, V: Sized>(map: HashMap<K, V>) -> PostData<K, V> {
-//         PostData {
-//             method: BodyType::MULTIPART,
-//             raw: "".to_string(),
-//             kv_store: map.clone()
-//         }
-//     }
-// }
+impl PostData {
+    pub fn get<Q: Into<String>>(&self, k: Q) -> Option<&String> {
+        return self.kv_store.get(k.into().as_str());
+    }
+
+    pub fn insert<K: Into<String>, V: Into<String>>(&mut self, k: K, v: V) -> usize {
+        self.kv_store.insert(k.into(), v.into());
+        return self.kv_store.len();
+    }
+
+    pub fn from_str<S: Into<String>>(str: S) -> PostData {
+        PostData {
+            method: BodyType::PLAINTEXT,
+            raw: str.into(),
+            kv_store: HashMap::<String, String>::new(),
+        }
+    }
+
+    pub fn from_tuple<S: Into<String>>(data: Vec<(S, S)>) -> PostData {
+        let mut kv_store = HashMap::<String, String>::new();
+
+        for (key, value) in data {
+            kv_store.insert(key.into(), value.into());
+        }
+
+        return PostData {
+            method: BodyType::MULTIPART,
+            raw: "".to_string(),
+            kv_store,
+        };
+    }
+
+    pub fn from_hash_map<S: Into<String>>(map: HashMap<S, S>) -> PostData {
+        let mut kv_store = HashMap::<String, String>::new();
+        for (key, value) in map {
+            kv_store.insert(key.into(), value.into());
+        }
+
+        return PostData {
+            method: BodyType::MULTIPART,
+            raw: "".to_string(),
+            kv_store,
+        };
+    }
+
+    pub fn deserialize(&self) -> (String, String) {
+        let mut form = String::new();
+        let mut body_type = String::from("application/json");
+        if self.kv_store.len() == 0 {
+            form = self.raw.clone();
+        } else {
+            body_type = String::from("application/x-www-form-urlencoded");
+            let passes = 0;
+            for (key, value) in self.kv_store.clone() {
+                if passes == 0 {
+                    form = format!("{}={}", key, value)
+                } else {
+                    form = format!("{}&{}={}", form, key, value)
+                }
+            }
+        }
+        return (body_type, form);
+    }
+}
