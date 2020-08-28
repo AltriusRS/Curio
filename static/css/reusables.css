@@ -9,10 +9,11 @@
 
 body {
     background-color: #0E3163;
-    height: 100%;
-    width: 100%;
+    min-height: 100%;
+    width: 100vw;
 }
 /*1655A8*/
+
 
 .navbar span {
     display: inline flow-root list-item;
@@ -84,12 +85,10 @@ body {
 }
 
 .content {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 100%;
-    min-height: 90vh;
+    min-height: 100%;
+    min-width: 100%;
     background-color: #181a1b;
+    text-align: center;
 }
 
 .footer {
@@ -98,20 +97,18 @@ body {
     text-align: center;
     background-color: #2d2d2d;
     width: 100%;
-    height: 5em;
-    position: absolute;
-    bottom: 0vh;
+    height: 4em;
+    position: relative;
+    bottom: 0;
 }
 
 .footer h5 {
-    flex-grow: 5;
-    padding: 1em 0em;
+    padding: 0.5em 0em;
     text-align: center;
 }
 
 .footer h4 {
-    flex-grow: 5;
-    padding: 1em 0em 0em 0em;
+    padding: 0.5em 0em 0em 0em;
     text-align: center;
 }
 

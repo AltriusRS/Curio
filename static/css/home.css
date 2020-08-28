@@ -1,8 +1,51 @@
 #landing {
-    flex-grow: 5;
     width: 100%;
-    padding: 5em;
     height: 10em;
     align-self: center;
     text-align: center;
+    padding: 5em 0;
+}
+
+.about-container {
+    align-self: center;
+    padding: 0 0 5em 2em;
+    width: 90%;
+}
+
+.about {
+    display: flex;
+    flex-direction: row;
+    padding: 4em 0;
+}
+
+.about .item {
+    padding: 1.5em;
+    background-color: #2d2d2d;
+    border: 1px #2d2d2d solid;
+    border-radius: 5%;
+    height: 15em;
+    width: 20em;
+}
+
+.about .item .item-title {
+    display: flex;
+    flex-direction: row;
+}
+
+.about .item .item-title i {
+    margin: 0.2em 0.5em 1em 0;
+    font-size: 1.5em;
+    font-weight: bolder;
+    text-align: center;
+}
+
+.about .item .item-title h2 {
+    text-align: center;
+    text-decoration: underline;
+    margin-bottom: 1em;
+}
+
+.about .item h4 {
+    text-align: center;
+    line-break: strict;
 }
