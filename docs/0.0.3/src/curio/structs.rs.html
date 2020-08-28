@@ -285,6 +285,45 @@
 <span id="285">285</span>
 <span id="286">286</span>
 <span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utils</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
@@ -313,68 +352,107 @@
 }
 
 
-<span class="doccomment">///</span>
+<span class="doccomment">/// Build a request, without any of the knowledge of how HTTP works, this structure takes care of it all, and still follows specifications</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Request</span> {
+    <span class="doccomment">/// The type of request to be performed (GET, HEAD, DELETE, POST, etc...)</span>
     <span class="kw">pub</span> <span class="ident">request_type</span>: <span class="ident">RequestType</span>,
+    <span class="doccomment">/// The raw URL input when you initialise the request, this is stored for you, we dont actually need to store this as we dont use it :)</span>
     <span class="kw">pub</span> <span class="ident">url_string</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The domain of the server to connect to</span>
     <span class="kw">pub</span> <span class="ident">domain</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The path to target our requests at</span>
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The protocol to use:</span>
+    <span class="doccomment">/// This can be HTTP, or HTTPS</span>
+    <span class="doccomment">/// If a server requests we use HTTPS, we will automatically switch over anyway, no fiddling needed</span>
     <span class="kw">pub</span> <span class="ident">protocol</span>: <span class="ident">HTTPVersion</span>,
+    <span class="doccomment">/// Not all requests have a body, this is an optional field containing a tuple value of both the encoding, and the body content</span>
     <span class="kw">pub</span> <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// This stores the values of each header you set within the request. This is the first step to authenticating a request</span>
     <span class="kw">pub</span> <span class="ident">headers</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// the number of headers this request stores in `headers`</span>
     <span class="kw">pub</span> <span class="ident">header_count</span>: <span class="ident">usize</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BodyType</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DataType</span> {
     <span class="ident">MULTIPART</span> <span class="op">=</span> <span class="number">0</span>,
     <span class="ident">PLAINTEXT</span> <span class="op">=</span> <span class="number">1</span>,
 }
 
+<span class="doccomment">/// store request body content through a variety of methods, resulting in similar, or identical outputs via HTTP POST</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostData</span> {
-    <span class="kw">pub</span> <span class="ident">method</span>: <span class="ident">BodyType</span>,
+    <span class="doccomment">/// The encoding method to be used for this data</span>
+    <span class="kw">pub</span> <span class="ident">method</span>: <span class="ident">DataType</span>,
+    <span class="doccomment">/// The storage of raw text input (see PostData::from_str for more info)</span>
     <span class="kw">pub</span> <span class="ident">raw</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The storage for key-value pairs such as HashMap and Tuple inputs</span>
     <span class="kw">pub</span> <span class="ident">kv_store</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// All the nitty gritty of a Response, put into a nicely formatted, easy to use structure for you to use</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Response</span> {
+    <span class="doccomment">/// The raw response body, minus the headers and status line</span>
     <span class="kw">pub</span> <span class="ident">raw</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The protocol __version__ (almost always HTTP/1.1) which was used in the response body</span>
     <span class="kw">pub</span> <span class="ident">protocol</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The status number of the response (200, 301, 404, 500 etc...)</span>
     <span class="kw">pub</span> <span class="ident">status</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The message provided by the server to go with this response</span>
     <span class="kw">pub</span> <span class="ident">status_text</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="comment">//pub content_type: String,</span>
+    <span class="doccomment">/// A HashMap containing the values of all headers, linked to their keys</span>
     <span class="kw">pub</span> <span class="ident">headers</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A running total of all the headers stored in the `headers` value</span>
     <span class="kw">pub</span> <span class="ident">header_count</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// A HashMap containing a list of all cookies set at the request of the server, linked to their keys</span>
     <span class="kw">pub</span> <span class="ident">cookies</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Cookie</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A running total of all the cookies stored in the `cookies` value</span>
     <span class="kw">pub</span> <span class="ident">cookie_count</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The (optional) body of the response, not all responses have these</span>
     <span class="kw">pub</span> <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Any warnings about the contents of your request, for example if the server requested an upgrade to HTTPS there will be an automated warning arrive here.</span>
+    <span class="doccomment">/// These can be ignored, but it might be worth fixing them before releasing your project to increase performance a tiny fraction</span>
     <span class="kw">pub</span> <span class="ident">warnings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// The structure used for internal parsing of headers</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Header</span> {
+    <span class="doccomment">/// The name of the header (Key)</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The content of the header (Value)</span>
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// The structure used for storing Cookies and their configuration</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Cookie</span> {
+    <span class="doccomment">/// The name of the cookie</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The cookie&#39;s value</span>
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// When the cookie should expire</span>
     <span class="kw">pub</span> <span class="ident">expires</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The path this cookie is applied to</span>
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The domain the cookie is applied to</span>
     <span class="kw">pub</span> <span class="ident">domain</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether this cookie is restricted from HTTPS requests</span>
     <span class="kw">pub</span> <span class="ident">http_only</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether the cookie can be transferred between websites</span>
     <span class="kw">pub</span> <span class="ident">same_site</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If the cookie requires HTTPS to be set</span>
     <span class="kw">pub</span> <span class="ident">secure</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// The maximum age of the cookie, in seconds</span>
     <span class="kw">pub</span> <span class="ident">max_age</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WarpConfig</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CurioConfig</span> {
     <span class="kw">pub</span> <span class="ident">no_parse</span>: <span class="ident">bool</span>
 }
 
@@ -521,7 +599,7 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">str</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PostData</span> {
         <span class="ident">PostData</span> {
-            <span class="ident">method</span>: <span class="ident">BodyType</span>::<span class="ident">PLAINTEXT</span>,
+            <span class="ident">method</span>: <span class="ident">DataType</span>::<span class="ident">PLAINTEXT</span>,
             <span class="ident">raw</span>: <span class="ident">str</span>.<span class="ident">into</span>(),
             <span class="ident">kv_store</span>: <span class="ident">HashMap</span>::<span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>::<span class="ident">new</span>(),
         }
@@ -535,7 +613,7 @@
         }
 
         <span class="kw">return</span> <span class="ident">PostData</span> {
-            <span class="ident">method</span>: <span class="ident">BodyType</span>::<span class="ident">MULTIPART</span>,
+            <span class="ident">method</span>: <span class="ident">DataType</span>::<span class="ident">MULTIPART</span>,
             <span class="ident">raw</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">kv_store</span>,
         };
@@ -548,7 +626,7 @@
         }
 
         <span class="kw">return</span> <span class="ident">PostData</span> {
-            <span class="ident">method</span>: <span class="ident">BodyType</span>::<span class="ident">MULTIPART</span>,
+            <span class="ident">method</span>: <span class="ident">DataType</span>::<span class="ident">MULTIPART</span>,
             <span class="ident">raw</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">kv_store</span>,
         };

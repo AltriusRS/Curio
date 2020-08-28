@@ -102,6 +102,9 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! # Curio</span>
 <span class="doccomment">//!</span>
@@ -111,7 +114,8 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! __examples below assume you are importing the `prelude` module as a base dependancy.__</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! GET content from a url:</span>
+<span class="doccomment">//! # GET content from a url:</span>
+<span class="doccomment">//! This one is just a simple GET request, no headers necessary here:</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! # use curio::prelude::*;</span>
 <span class="doccomment">//! fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
@@ -123,7 +127,8 @@
 <span class="doccomment">//! }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! POST tuple content to a url:</span>
+<span class="doccomment">//! # POST tuple content to a url:</span>
+<span class="doccomment">//! If the endpoint that you are posting data to supports `application/x-www-form-urlencoded` body structures but you __dont__ want to use a HashMap for whatever reason, this method is the way to go:</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! # use curio::prelude::*;</span>
 <span class="doccomment">//! fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
@@ -148,7 +153,8 @@
 <span class="doccomment">//! }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! POST HashMap content to a url:</span>
+<span class="doccomment">//! # POST HashMap content to a url:</span>
+<span class="doccomment">//! If the endpoint that you are posting data to supports `application/x-www-form-urlencoded` body structures, the example below should work pretty well for most users:</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! # use std::collections::HashMap;</span>
 <span class="doccomment">//! # use curio::prelude::*;</span>
@@ -172,9 +178,9 @@
 <span class="doccomment">//!     Ok(())</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! POST plaintext content to a url:</span>
+<span class="doccomment">//! # POST plaintext content to a url:</span>
+<span class="doccomment">//! Does the endpoint you want to POST data to accept plaintext? the example below might work best for this situation:</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use std::collections::HashMap;</span>
 <span class="doccomment">//! # use curio::prelude::*;</span>
 <span class="doccomment">//! fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
 <span class="doccomment">//!     // lets define a string containing the content body.</span>
