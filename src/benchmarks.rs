@@ -69,7 +69,6 @@ fn bench<A, B>(name: A, passes: usize, call: B) -> () where A: Into<String>, B: 
 
     let mut total: usize = 0;
 
-    let mut avg: usize = 0;
     let mut high: usize = 0;
     let mut low: usize = 10000;
 
@@ -83,7 +82,7 @@ fn bench<A, B>(name: A, passes: usize, call: B) -> () where A: Into<String>, B: 
         }
     }
 
-    avg = total / LIMIT;
+    let avg: usize = total / LIMIT;
 
     println!("{}; ({} passes): Avg: {} us  |  High: {} us  |  Low: {} us  |  S.D: {} us", name.into(), passes, avg.clone(), high, low, std_deviation(times, avg).unwrap_or(0));
 

@@ -13,7 +13,7 @@ pub fn get<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<Resp
     let location = path.into();
     let (can_run, reason) = preflight(host.clone(), location.clone(), "HEAD".to_string());
     return if can_run {
-        let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+        let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Curio/0.1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
         let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
         let config = Arc::new(build_tls_config());
@@ -82,7 +82,7 @@ pub fn post<S: Into<String>>(domain: S, path: S, request_struct: Request, is_upg
     let (can_run, reason) = preflight(host.clone(), location.clone(), "HEAD".to_string());
     return if can_run {
         let (post_type, content) = request_struct.body.unwrap();
-        let request = format!("POST {} HTTP/1.1\r\nAccept: application/json\r\nContent-Length: {}\r\nContent-Type: {}\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n{}", location, content.len(), post_type, host, content);
+        let request = format!("POST {} HTTP/1.1\r\nAccept: application/json\r\nContent-Length: {}\r\nContent-Type: {}\r\nUser-Agent: Curio/0.1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n{}", location, content.len(), post_type, host, content);
 
         let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
         let config = Arc::new(build_tls_config());
@@ -149,7 +149,7 @@ pub fn delete<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<R
     let location = path.into();
     let (can_run, reason) = preflight(host.clone(), location.clone(), "HEAD".to_string());
     return if can_run {
-        let request = format!("DELETE {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+        let request = format!("DELETE {} HTTP/1.1\r\nUser-Agent: Curio/0.1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
 
         let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
@@ -194,7 +194,7 @@ pub fn head<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<Res
     let location = path.into();
     let (can_run, reason) = preflight(host.clone(), location.clone(), "HEAD".to_string());
     return if can_run {
-        let request = format!("HEAD {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+        let request = format!("HEAD {} HTTP/1.1\r\nUser-Agent: Curio/0.1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
         let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
         let config = Arc::new(build_tls_config());
@@ -236,7 +236,7 @@ pub fn options<S: Into<String>>(domain: S, path: S, is_upgrade: bool) -> Result<
     let host = domain.into();
     let location = path.into();
 
-    let request = format!("OPTIONS {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+    let request = format!("OPTIONS {} HTTP/1.1\r\nUser-Agent: Curio/0.1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
     let mut socket = TcpStream::connect(format!("{}:443", host)).unwrap();
     let config = Arc::new(build_tls_config());

@@ -8,7 +8,7 @@ pub fn get<S: Into<String>>(domain: S, path: S) -> Result<Response, Box<dyn std:
     let location = path.into();
     let (can_run, reason) = preflight(host.clone(), location.clone(), "GET".to_string());
     return if can_run {
-        let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+        let request = format!("GET {} HTTP/1.1\r\nUser-Agent: Curio/0.1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
         let mut stream = TcpStream::connect(format!("{}:80", host)).unwrap();
 
@@ -66,7 +66,7 @@ pub fn post<S: Into<String>>(domain: S, path: S, request_struct: Request) -> Res
     let (can_run, reason) = preflight(host.clone(), location.clone(), "HEAD".to_string());
     return if can_run {
         let (post_type, content) = request_struct.clone().body.unwrap();
-        let request = format!("POST {} HTTP/1.1\r\nAccept: application/json\r\nContent-Length: {}\r\nContent-Type: {}\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n{}", location, content.len(), post_type, host, content);
+        let request = format!("POST {} HTTP/1.1\r\nAccept: application/json\r\nContent-Length: {}\r\nContent-Type: {}\r\nUser-Agent: Curio/0.1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n{}", location, content.len(), post_type, host, content);
 
 
         let mut stream = TcpStream::connect(format!("{}:80", host)).unwrap();
@@ -124,7 +124,7 @@ pub fn delete<S: Into<String>>(domain: S, path: S) -> Result<Response, Box<dyn s
     let location = path.into();
     let (can_run, reason) = preflight(host.clone(), location.clone(), "HEAD".to_string());
     return if can_run {
-        let request = format!("DELETE {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+        let request = format!("DELETE {} HTTP/1.1\r\nUser-Agent: Curio/0.1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
 
         let mut stream = TcpStream::connect(format!("{}:80", host)).unwrap();
@@ -166,7 +166,7 @@ pub fn head<S: Into<String>>(domain: S, path: S) -> Result<Response, Box<dyn std
     let location = path.into();
     let (can_run, reason) = preflight(host.clone(), location.clone(), "HEAD".to_string());
     return if can_run {
-        let request = format!("HEAD {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
+        let request = format!("HEAD {} HTTP/1.1\r\nUser-Agent: Curio/0.1.0\r\nHost: {}\r\nConnection: Keep-Alive\r\n\r\n", location, host);
 
         let mut stream = TcpStream::connect(format!("{}:80", host)).unwrap();
 
@@ -205,7 +205,7 @@ pub fn options<S: Into<String>>(domain: S, path: S) -> Result<Response, Box<dyn 
     let host = domain.into();
     let location = path.into();
 
-    let request = format!("OPTIONS {} HTTP/1.1\r\nUser-Agent: Warp/1.0\r\nHost: {}\r\nOriginConnection: Keep-Alive\r\n\r\n", location, host);
+    let request = format!("OPTIONS {} HTTP/1.1\r\nUser-Agent: Curio/0.1.0\r\nHost: {}\r\nOriginConnection: Keep-Alive\r\n\r\n", location, host);
 
     let mut stream = TcpStream::connect(format!("{}:80", host)).unwrap();
 

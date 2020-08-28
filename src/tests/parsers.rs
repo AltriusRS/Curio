@@ -22,7 +22,7 @@ fn test_post_data_parser_from_hash_map() {
     let mut data = HashMap::new();
     data.insert("Key", "Value");
 
-    let body = crate::structs::PostData::from_hash_map(data.clone());
+    let body = crate::structs::PostData::from_hash_map(data);
     println!("{:#?}", body);
     assert_eq!(body.get("Key").unwrap(), &"Value");
 }
@@ -31,7 +31,7 @@ fn test_post_data_parser_from_hash_map() {
 fn test_post_data_parser_from_tuple() {
     let data = vec!(("Key", "Value"));
 
-    let mut body = crate::structs::PostData::from_tuple(data.clone());
+    let mut body = crate::structs::PostData::from_tuple(data);
     body.insert("Perhaps", "YES");
     println!("{:#?}", body);
     assert_eq!(body.get("Key").unwrap(), &"Value");
