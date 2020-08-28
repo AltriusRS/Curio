@@ -1,0 +1,143 @@
+ENV BAMF_DESKTOP_FILE_HINT=/var/lib/snapd/desktop/applications/clion_clion.desktop
+ENV CARGO=/home/altrius/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo
+ENV CARGO_CFG_TARGET_ARCH=x86_64
+ENV CARGO_CFG_TARGET_ENDIAN=little
+ENV CARGO_CFG_TARGET_ENV=gnu
+ENV CARGO_CFG_TARGET_FAMILY=unix
+ENV CARGO_CFG_TARGET_FEATURE=fxsr,sse,sse2
+ENV CARGO_CFG_TARGET_OS=linux
+ENV CARGO_CFG_TARGET_POINTER_WIDTH=64
+ENV CARGO_CFG_TARGET_VENDOR=unknown
+ENV CARGO_CFG_UNIX=
+ENV CARGO_FEATURE_ALLOC=1
+ENV CARGO_FEATURE_DEFAULT=1
+ENV CARGO_FEATURE_DEV_URANDOM_FALLBACK=1
+ENV CARGO_FEATURE_ONCE_CELL=1
+ENV CARGO_HOME=/home/altrius/.cargo
+ENV CARGO_MAKEFLAGS=--jobserver-fds=7,8 -j --jobserver-auth=7,8 -j
+ENV CARGO_MANIFEST_DIR=/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15
+ENV CARGO_MANIFEST_LINKS=ring-asm
+ENV CARGO_PKG_AUTHORS=Brian Smith <brian@briansmith.org>
+ENV CARGO_PKG_DESCRIPTION=Safe, fast, small crypto using Rust.
+ENV CARGO_PKG_HOMEPAGE=
+ENV CARGO_PKG_NAME=ring
+ENV CARGO_PKG_REPOSITORY=https://github.com/briansmith/ring
+ENV CARGO_PKG_VERSION=0.16.15
+ENV CARGO_PKG_VERSION_MAJOR=0
+ENV CARGO_PKG_VERSION_MINOR=16
+ENV CARGO_PKG_VERSION_PATCH=15
+ENV CARGO_PKG_VERSION_PRE=
+ENV CLUTTER_IM_MODULE=ibus
+ENV CONDA_DEFAULT_ENV=base
+ENV CONDA_EXE=/home/altrius/anaconda3/bin/conda
+ENV CONDA_PREFIX=/home/altrius/anaconda3
+ENV CONDA_PROMPT_MODIFIER=(base) 
+ENV CONDA_PYTHON_EXE=/home/altrius/anaconda3/bin/python
+ENV CONDA_SHLVL=1
+ENV DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+ENV DEBUG=true
+ENV DESKTOP_SESSION=ubuntu
+ENV DISPLAY=:0
+ENV GDMSESSION=ubuntu
+ENV GIO_LAUNCHED_DESKTOP_FILE=/var/lib/snapd/desktop/applications/clion_clion.desktop
+ENV GIO_LAUNCHED_DESKTOP_FILE_PID=3715
+ENV GJS_DEBUG_OUTPUT=stderr
+ENV GJS_DEBUG_TOPICS=JS ERROR;JS LOG
+ENV GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+ENV GNOME_SHELL_SESSION_MODE=ubuntu
+ENV GPG_AGENT_INFO=/run/user/1000/gnupg/S.gpg-agent:0:1
+ENV GTK_IM_MODULE=ibus
+ENV GTK_MODULES=gail:atk-bridge
+ENV HOME=/home/altrius
+ENV HOST=x86_64-unknown-linux-gnu
+ENV IM_CONFIG_PHASE=1
+ENV INVOCATION_ID=dd52293551034de7a02e251a16cdd1b5
+ENV JOURNAL_STREAM=9:40065
+ENV LANG=en_GB.UTF-8
+ENV LANGUAGE=en_GB:en
+ENV LD_LIBRARY_PATH=/media/altrius/programming2/js/Curio/docs/0.0.3/debug/deps:/media/altrius/programming2/js/Curio/docs/0.0.3/debug:/home/altrius/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib:/home/altrius/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib
+ENV LESSCLOSE=/usr/bin/lesspipe %s %s
+ENV LESSOPEN=| /usr/bin/lesspipe %s
+ENV LOGNAME=altrius
+ENV LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
+ENV MANAGERPID=1410
+ENV NUM_JOBS=4
+ENV OLDPWD=/snap/clion/124/bin
+ENV OPT_LEVEL=0
+ENV OUT_DIR=/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out
+ENV PATH=/home/altrius/.cargo/bin:/home/altrius/anaconda3/bin:/home/altrius/anaconda3/condabin:/home/altrius/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/home/altrius/.cargo/bin:/snap/bin
+ENV PROFILE=debug
+ENV PWD=/media/altrius/programming2/Rust/Curio
+ENV QT4_IM_MODULE=ibus
+ENV QT_ACCESSIBILITY=1
+ENV QT_IM_MODULE=ibus
+ENV RUSTC=rustc
+ENV RUSTDOC=rustdoc
+ENV RUSTUP_HOME=/home/altrius/.rustup
+ENV RUSTUP_TOOLCHAIN=stable-x86_64-unknown-linux-gnu
+ENV RUST_RECURSION_COUNT=1
+ENV SESSION_MANAGER=local/Olly-OMEN:@/tmp/.ICE-unix/1813,unix/Olly-OMEN:/tmp/.ICE-unix/1813
+ENV SHELL=/bin/bash
+ENV SHLVL=1
+ENV SNAP=/snap/clion/124
+ENV SNAP_ARCH=amd64
+ENV SNAP_COMMON=/var/snap/clion/common
+ENV SNAP_CONTEXT=R4njz4qMxEfdL3ex6gBhr8Nq-OcbP7ANyHq3e6g8JFqsge0sPB6A
+ENV SNAP_COOKIE=R4njz4qMxEfdL3ex6gBhr8Nq-OcbP7ANyHq3e6g8JFqsge0sPB6A
+ENV SNAP_DATA=/var/snap/clion/124
+ENV SNAP_INSTANCE_KEY=
+ENV SNAP_INSTANCE_NAME=clion
+ENV SNAP_LIBRARY_PATH=/var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd/void
+ENV SNAP_NAME=clion
+ENV SNAP_REEXEC=
+ENV SNAP_REVISION=124
+ENV SNAP_USER_COMMON=/home/altrius/snap/clion/common
+ENV SNAP_USER_DATA=/home/altrius/snap/clion/124
+ENV SNAP_VERSION=2020.2.1
+ENV SSH_AGENT_PID=1701
+ENV SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
+ENV SSL_CERT_DIR=/usr/lib/ssl/certs
+ENV SSL_CERT_FILE=/usr/lib/ssl/certs/ca-certificates.crt
+ENV TARGET=x86_64-unknown-linux-gnu
+ENV TERM=xterm-256color
+ENV TERMINAL_EMULATOR=JetBrains-JediTerm
+ENV USER=altrius
+ENV USERNAME=altrius
+ENV WINDOWPATH=2
+ENV XAUTHORITY=/run/user/1000/gdm/Xauthority
+ENV XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/etc/xdg
+ENV XDG_CURRENT_DESKTOP=ubuntu:GNOME
+ENV XDG_DATA_DIRS=/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop
+ENV XDG_MENU_PREFIX=gnome-
+ENV XDG_RUNTIME_DIR=/run/user/1000/snap.clion
+ENV XDG_SESSION_CLASS=user
+ENV XDG_SESSION_DESKTOP=ubuntu
+ENV XDG_SESSION_TYPE=x11
+ENV XMODIFIERS=@im=ibus
+ENV _=/home/altrius/.cargo/bin/cargo
+ENV _CE_CONDA=
+ENV _CE_M=
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/aesni-x86_64-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/aesni-x86_64-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/vpaes-x86_64-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/vpaes-x86_64-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/x86_64-mont-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/x86_64-mont-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/x86_64-mont5-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/x86_64-mont5-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/chacha-x86_64-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/chacha-x86_64-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/p256-x86_64-asm-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/p256-x86_64-asm-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/aesni-gcm-x86_64-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/aesni-gcm-x86_64-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/ghash-x86_64-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/ghash-x86_64-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/poly1305-x86_64-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/poly1305-x86_64-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/sha512-x86_64-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/sha512-x86_64-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/sha256-x86_64-elf.o" "/home/altrius/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/pregenerated/sha256-x86_64-elf.S"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/aes_nohw.o" "crypto/fipsmodule/aes/aes_nohw.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/montgomery.o" "crypto/fipsmodule/bn/montgomery.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/montgomery_inv.o" "crypto/fipsmodule/bn/montgomery_inv.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/limbs.o" "crypto/limbs/limbs.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/mem.o" "crypto/mem.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/crypto.o" "crypto/crypto.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/curve25519.o" "crypto/curve25519/curve25519.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/ecp_nistz.o" "crypto/fipsmodule/ec/ecp_nistz.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/ecp_nistz256.o" "crypto/fipsmodule/ec/ecp_nistz256.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/gfp_p256.o" "crypto/fipsmodule/ec/gfp_p256.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/gfp_p384.o" "crypto/fipsmodule/ec/gfp_p384.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/cpu-intel.o" "crypto/cpu-intel.c"
+running "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-g" "-fno-omit-frame-pointer" "-m64" "-I" "include" "-Wall" "-Wextra" "-std=c1x" "-Wbad-function-cast" "-Wnested-externs" "-Wstrict-prototypes" "-pedantic" "-pedantic-errors" "-Wall" "-Wextra" "-Wcast-align" "-Wcast-qual" "-Wconversion" "-Wenum-compare" "-Wfloat-equal" "-Wformat=2" "-Winline" "-Winvalid-pch" "-Wmissing-field-initializers" "-Wmissing-include-dirs" "-Wredundant-decls" "-Wshadow" "-Wsign-compare" "-Wsign-conversion" "-Wundef" "-Wuninitialized" "-Wwrite-strings" "-fno-strict-aliasing" "-fvisibility=hidden" "-fstack-protector" "-g3" "-DNDEBUG" "-c" "-o/media/altrius/programming2/js/Curio/docs/0.0.3/debug/build/ring-6cd2974d5b89aa80/out/constant_time_test.o" "crypto/constant_time_test.c"

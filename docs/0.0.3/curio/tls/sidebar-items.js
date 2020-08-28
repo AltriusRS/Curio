@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["delete",""],["get",""],["head",""],["options",""],["post",""]]});
