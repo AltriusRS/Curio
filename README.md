@@ -24,6 +24,7 @@ Curio supports most of the most common HTTP methods:
 - `GET`
 - `POST`
 - `DELETE`
+
 Curio also supports the following HTTP methods:
 - `OPTIONS`
 - `HEAD`
