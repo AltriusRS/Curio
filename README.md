@@ -37,6 +37,40 @@ In a future version, all of these features will be configurable, for example you
 
 You can view the most up-to-date documentaion [here](https://curio.cf/docs/latest) however as this is not promised to be in-sync with the docs on [docs.rs](https://docs.rs/) you should probably use those if you are not importing from this repository
 
+## Examples:
+
+### Simple GET request:
+A simple GET request to `some-domain.tld/path/to/resource` should look something like this:
+```rust
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let response = Request::get("https://some-domain.tld/path/to/resource")
+        .send()?;
+
+    println!("{:#?}", response);
+    Ok(())
+}
+```
+
+### POST plaintext content:
+A simple POST request that is posting plaintext content looks like this:
+```rust
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut post_body = "This is some example content to POST";
+
+    // convert the string into a format accepted by the `set_body` method.
+    let post_data = PostData::from_str(post_body);
+
+    // below, set the destination of the post body using the `post` method,
+    // set the body using the `set_body` method,
+    // and send the request by using the `send` method
+    let response = Request::post("https://some-domain.tld/documents")
+        .set_body(&post_data)
+        .send()?;
+
+    println!("{:#?}", response);
+    Ok(())
+}
+```
 # Milestones
 
 Wed 26th Aug 2020 - First fully capable GET request handler: [Commit 496ae5f](https://github.com/fatalcenturion/Curio/commit/496ae5f909b750638009bbdc4aa10760e801f731) 
