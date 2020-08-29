@@ -7,15 +7,16 @@
 ### What is Curio?
 
 Curio is a small HTTP client built in the [Rust Programming Language](https://rust-lang.org) from Mozilla. 
-It was started by myself as a way to learn the ins and outs of HTTP and its quirks, After all there is nothing much more interesting to me than the standard that defines the internet.
+It was started by myself as a way to learn the ins and outs of HTTP and its quirks, after all there is nothing more interesting to me than the standards that define the internet.
 Its primary goal above all else is performance, closely followed by ease of use.
-If You are proficient in Rust, and know how to help me improve the performance of Curio, please do not hesitate to open an issue tagged with the feature tag.
-If you have a feature you think would be perfect for Curio, and would be useful to more than just yourself, please open an issue with the feature tag.
+If you are proficient in Rust, and know how to help me improve the performance of Curio, please do not hesitate to open an issue tagged with the optimization tag.
+If you have a feature you think would be perfect for Curio and would be useful to more than just yourself, please open an issue with the feature tag.
 
+Whilst Curio is ready to use, I am always looking to improve it. If you have any suggestions please open an [issue](https://github.com/fatalcenturion/Curio/issues/new/choose)
 
-### Why should I use Curio over <other rust http library>?
+### Why should I use Curio over other HTTP clients?
 
-A simple answer to this is that you probably shouldnt, there are not many situations where Curio is likely to be the best option for your project. I am working to improve this though so maybe you could at least give Curio a chance, and leave me some feedback in the form of a feature suggestion
+Curio is a fresh take on how to handle HTTP clients and aims to provide a cross-platform, cross-language library which can be used almost anywhere.
 
 ### Does Curio support X?
 
@@ -23,10 +24,13 @@ Curio supports most of the most common HTTP methods:
 - `GET`
 - `POST`
 - `DELETE`
+Curio also supports the following HTTP methods:
+- `OPTIONS`
+- `HEAD`
 
-It also supports CORS request moderation. It performs a preflight request to the requested resource to ensure that the request can go ahead
+It also supports CORS request moderation. It performs a preflight request to the requested resource to ensure that the request can go ahead .
 
-This library also supports automatic https upgrading. 
+This library also supports automatic HTTPS upgrading. 
 
 In a future version, all of these features will be configurable, for example you could disable CORS blocking for that request, or you could force the client to use TCP instead of TLS.
 
