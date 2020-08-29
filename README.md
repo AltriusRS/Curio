@@ -15,35 +15,34 @@ If you have a feature you think would be perfect for Curio, and would be useful 
 
 ### Why should I use Curio over <other rust http library>?
 
-Long story short; you shouldn't. Curio will likely never reach a stage of feature-completeness rivaling the more mature clients.
-
+A simple answer to this is that you probably shouldnt, there are not many situations where Curio is likely to be the best option for your project. I am working to improve this though so maybe you could at least give Curio a chance, and leave me some feedback in the form of a feature suggestion
 
 ### Does Curio support X?
 
-Again, probably not, and it possibly never will.
-If I can find the time to add the feature then it might, but I have to split my time between a part time job, college, coding, and myself, so it is unlikely that I will be able to find the time to code a lot in one session.
+Curio supports most of the most common HTTP methods:
+- `GET`
+- `POST`
+- `DELETE`
 
+It also supports CORS request moderation. It performs a preflight request to the requested resource to ensure that the request can go ahead
+
+This library also supports automatic https upgrading. 
+
+In a future version, all of these features will be configurable, for example you could disable CORS blocking for that request, or you could force the client to use TCP instead of TLS.
 
 ------
 
 
 # Documentation
 
-Currently this library is heavily under development and as such is completely nonfunctional. There are no docs to ensure nobody uses it in its current state other than the developer.
-
+You can view the most up-to-date documentaion [here](https://curio.cf/docs/latest) however as this is not promised to be in-sync with the docs on [docs.rs](https://docs.rs/) you should probably use those if you are not importing from this repository
 
 # Milestones
 
 Wed 26th Aug 2020 - First fully capable GET request handler: [Commit 496ae5f](https://github.com/fatalcenturion/Curio/commit/496ae5f909b750638009bbdc4aa10760e801f731) 
 
+Sat 29th Aug 2020 - Curio 0.0.3 (preflight for 0.1.0) is completed, and preperations for release begin.
 
-# Internal Benchmarks
-> Note: These benchmarks are for the internals of Curio, they are not comparable to any other http client.
+# Benchmarks
 
-(all times in microseconds (denoted: `us`) over a span of 10000 runs)
-|Name|Average|High|Low|Standard Deviation|
-|:---:|:---:|:---:|:---:|:---:|
-|Full request cycle|619 us|9280 us|448 us|299 us|
-|Parse Cookie|60 us|247 us|53 us|14 us|
-|Parse Header|4 us|126 us|4 us|2 us|
-|Parse Response|261 us|550 us|235 us|41 us|
+I am currently working on a full comparable benchmarking suite to compare Curio to other Rust HTTP clients, watch this space people
