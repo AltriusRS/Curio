@@ -96,10 +96,12 @@
 
 #[doc(hidden)]
 pub mod tls;
+
 #[doc(hidden)]
 pub mod tcp;
 
 pub mod structs;
+
 #[doc(hidden)]
 pub mod utils;
 

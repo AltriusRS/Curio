@@ -14,14 +14,14 @@ const LIMIT: usize = 10000;
 //
 // #[test]
 // fn bench_reqwest_get() {
-//     bench("Reqwest GET", 100, || {
+//     bench("Reqwest GET", LIMIT, || {
 //         reqwest::blocking::get("http://localhost:80/");
 //     })
 // }
 //
 // #[test]
 // fn bench_hyper_get() {
-//     bench("Hyper GET", 100, || {
+//     bench("Hyper GET", LIMIT, || {
 //         let client = hyper::Client::new();
 //         let uri = hyper::Uri::from_static("http://localhost:80/");
 //         aw!(client.get(uri));
@@ -30,7 +30,7 @@ const LIMIT: usize = 10000;
 //
 // #[test]
 // fn bench_curio_get() {
-//     bench("Curio GET", 100, || {
+//     bench("Curio GET", LIMIT, || {
 //         crate::prelude::Request::get("http://localhost/").send();
 //     })
 // }
