@@ -1,8 +1,39 @@
 #[allow(non_snake_case)]
 use std::time::Instant;
 
-
 const LIMIT: usize = 10000;
+
+// Why are these three benchmarks commented out?
+// Well, they need a localhost server on port 80, that is why.
+
+// macro_rules! aw {
+//     ($e:expr) => {
+//         tokio_test::block_on($e)
+//     };
+//   }
+//
+// #[test]
+// fn bench_reqwest_get() {
+//     bench("Reqwest GET", 100, || {
+//         reqwest::blocking::get("http://localhost:80/");
+//     })
+// }
+//
+// #[test]
+// fn bench_hyper_get() {
+//     bench("Hyper GET", 100, || {
+//         let client = hyper::Client::new();
+//         let uri = hyper::Uri::from_static("http://localhost:80/");
+//         aw!(client.get(uri));
+//     })
+// }
+//
+// #[test]
+// fn bench_curio_get() {
+//     bench("Curio GET", 100, || {
+//         crate::prelude::Request::get("http://localhost/").send();
+//     })
+// }
 
 #[test]
 fn bench_response_parsing() {
