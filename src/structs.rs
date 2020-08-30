@@ -142,10 +142,10 @@ impl Request {
     /// ```
     /// # use curio::prelude::*;
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let response = Request::get("https://some-domain.tld/path/to/resource")
+    ///     let response = Request::get("https://example.com//path/to/resource")
     ///         .send()?;
     ///
-    ///     println!("{:#?}", request);
+    ///     println!("{:#?}", response);
     ///     Ok(())
     /// }
     /// ```
@@ -171,10 +171,10 @@ impl Request {
     /// ```
     /// # use curio::prelude::*;
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let response = Request::head("https://some-domain.tld/path/to/resource")
+    ///     let response = Request::head("https://example.com//path/to/resource")
     ///         .send()?;
     ///
-    ///     println!("{:#?}", request);
+    ///     println!("{:#?}", response);
     ///     Ok(())
     /// }
     /// ```
@@ -199,10 +199,10 @@ impl Request {
     /// ```
     /// # use curio::prelude::*;
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let response = Request::delete("https://some-domain.tld/path/to/resource")
+    ///     let response = Request::delete("https://example.com//path/to/resource")
     ///         .send()?;
     ///
-    ///     println!("{:#?}", request);
+    ///     println!("{:#?}", response);
     ///     Ok(())
     /// }
     /// ```
@@ -227,10 +227,10 @@ impl Request {
     /// ```
     /// # use curio::prelude::*;
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let response = Request::options("https://some-domain.tld/path/to/resource")
+    ///     let response = Request::options("https://example.com//path/to/resource")
     ///         .send()?;
     ///
-    ///     println!("{:#?}", request);
+    ///     println!("{:#?}", response);
     ///     Ok(())
     /// }
     /// ```
@@ -255,13 +255,13 @@ impl Request {
     /// ```
     /// # use curio::prelude::*;
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let post_body: Vec<(&str, &str)> = Vec!(
+    ///     let post_body: Vec<(&str, &str)> = vec!(
     ///         ("author", "Altrius"),
     ///         ("timestamp", "Fri, 28 Aug 2020 10:55:44 +0000")
     ///     );
     ///
     ///     let post_data = PostData::from_tuple(post_body);
-    ///     let response = Request::post("https://some-domain.tld/documents")
+    ///     let response = Request::post("https://example.com//documents")
     ///         .set_body(&post_data)
     ///         .send()?;
     ///
@@ -301,7 +301,7 @@ impl Request {
     /// ```
     /// # use curio::prelude::*;
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let response = Request::get("https://some-domain.tld/documents")
+    ///     let response = Request::get("https://example.com//documents")
     ///         .set_header("<header name>", "<header value>")
     ///         .send()?;
     ///

@@ -34,3 +34,20 @@ fn test_tls_get() {
     println!("{:#?}", response);
     assert_eq!(response.status.unwrap(), 200);
 }
+#[test]
+fn test_tls_put() {
+    let mut request = crate::structs::Request::delete("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
+    request.request_type = crate::structs::RequestType::PUT;
+    let response = request.send().unwrap();
+    println!("{:#?}", response);
+    assert_eq!(response.status.unwrap(), 200);
+}
+
+#[test]
+fn test_tls_patch() {
+    let mut request = crate::structs::Request::delete("https://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
+    request.request_type = crate::structs::RequestType::PATCH;
+    let response = request.send().unwrap();
+    println!("{:#?}", response);
+    assert_eq!(response.status.unwrap(), 200);
+}

@@ -11,7 +11,7 @@
 //! ```
 //! # use curio::prelude::*;
 //! fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let response = Request::get("https://some-domain.tld/path/to/resource")
+//!     let response = Request::get("https://example.com//path/to/resource")
 //!         .send()?;
 //!
 //!     println!("{:#?}", response);
@@ -36,7 +36,7 @@
 //!     // below, we set the destination of the post body using the `post` method,
 //!     // we set the body using the `set_body` method,
 //!     // and we send the request by using the `send` method
-//!     let response = Request::post("https://some-domain.tld/documents")
+//!     let response = Request::post("https://example.com//documents")
 //!         .set_body(&post_data)
 //!         .send()?;
 //!
@@ -62,7 +62,7 @@
 //!     // below, we set the destination of the post body using the `post` method,
 //!     // we set the body using the `set_body` method,
 //!     // and we send the request by using the `send` method
-//!     let response = Request::post("https://some-domain.tld/documents")
+//!     let response = Request::post("https://example.com//documents")
 //!         .set_body(&post_data)
 //!         .send()?;
 //!
@@ -85,7 +85,7 @@
 //!     // below, we set the destination of the post body using the `post` method,
 //!     // we set the body using the `set_body` method,
 //!     // and we send the request by using the `send` method
-//!     let response = Request::post("https://some-domain.tld/documents")
+//!     let response = Request::post("https://example.com//documents")
 //!         .set_body(&post_data)
 //!         .send()?;
 //!
