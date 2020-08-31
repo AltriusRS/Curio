@@ -7,15 +7,16 @@
 ### What is Curio?
 
 Curio is a small HTTP client built in the [Rust Programming Language](https://rust-lang.org) from Mozilla. 
-It was started by myself as a way to learn the ins and outs of HTTP and its quirks, After all there is nothing much more interesting to me than the standard that defines the internet.
+It was started by myself as a way to learn the ins and outs of HTTP and its quirks, after all there is nothing more interesting to me than the standards that define the internet.
 Its primary goal above all else is performance, closely followed by ease of use.
-If You are proficient in Rust, and know how to help me improve the performance of Curio, please do not hesitate to open an issue tagged with the feature tag.
-If you have a feature you think would be perfect for Curio, and would be useful to more than just yourself, please open an issue with the feature tag.
+If you are proficient in Rust, and know how to help me improve the performance of Curio, please do not hesitate to open an issue tagged with the optimization tag.
+If you have a feature you think would be perfect for Curio and would be useful to more than just yourself, please open an issue with the feature tag.
 
+Whilst Curio is ready to use, I am always looking to improve it. If you have any suggestions please open an [issue](https://github.com/fatalcenturion/Curio/issues/new/choose)
 
-### Why should I use Curio over <other rust http library>?
+### Why should I use Curio over other HTTP clients?
 
-A simple answer to this is that you probably shouldnt, there are not many situations where Curio is likely to be the best option for your project. I am working to improve this though so maybe you could at least give Curio a chance, and leave me some feedback in the form of a feature suggestion
+Curio is a fresh take on how to handle HTTP clients and aims to provide a cross-platform, cross-language library which can be used almost anywhere.
 
 ### Does Curio support X?
 
@@ -24,9 +25,13 @@ Curio supports most of the most common HTTP methods:
 - `POST`
 - `DELETE`
 
-It also supports CORS request moderation. It performs a preflight request to the requested resource to ensure that the request can go ahead
+Curio also supports the following HTTP methods:
+- `OPTIONS`
+- `HEAD`
 
-This library also supports automatic https upgrading. 
+It also supports CORS request moderation. It performs a preflight request to the requested resource to ensure that the request can go ahead .
+
+This library also supports automatic HTTPS upgrading. 
 
 In a future version, all of these features will be configurable, for example you could disable CORS blocking for that request, or you could force the client to use TCP instead of TLS.
 
@@ -35,7 +40,7 @@ In a future version, all of these features will be configurable, for example you
 
 # Documentation
 
-You can view the most up-to-date documentaion [here](https://curio.cf/docs/latest) however as this is not promised to be in-sync with the docs on [docs.rs](https://docs.rs/) you should probably use those if you are not importing from this repository
+You can view the most up-to-date documentation [here](https://curio.cf/docs/latest) however as this is not promised to be in-sync with the docs on [docs.rs](https://docs.rs/) you should probably use those if you are not importing from this repository
 
 ## Examples:
 
@@ -79,4 +84,14 @@ Sat 29th Aug 2020 - Curio 0.0.3 (preflight for 0.1.0) is completed, and preperat
 
 # Benchmarks
 
-I am currently working on a full comparable benchmarking suite to compare Curio to other Rust HTTP clients, watch this space people
+| Method | Library | Total Runs | Average Time | Highest Time | Lowest Time | Standard Deviation | Total Time |compared to Curio|
+|:------:|:-------:|:----------:|:------------:|:------------:|:-----------:|:------------------:|:----------:|:----:|
+|  GET   | Reqwest |   10,000    |   7.475 ms   |   62.460 ms  |   6.221 ms  |      1.966 ms      |   12 minutes, 27 seconds | 1019% slower |
+|  GET   |  Hyper  |   10,000    |   1.108 ms   |   11.78 ms   |   0.800 ms  |      0.425 ms      |   1 minute, 50 seconds   | 66% slower |
+|  GET   |  Curio  |   10,000    |   0.668 ms   |   9.772 ms   |   0.523 ms  |      0.147 ms      |   1 minute, 6 seconds    | N/A |
+|  POST  | Reqwest |   10,000    |   1.348 ms   |   22.712 ms  |   1.064 ms  |      0.511 ms      |   2 minutes, 14 seconds  |99% slower|
+|  POST  |  Hyper  |   10,000    |   1.138 ms   |   10.660 ms  |   0.839 ms  |      0.369 ms      |   1 minute, 53 seconds   |68% slower|
+|  POST  |  Curio  |   10,000    |   0.676 ms   |   2.613 ms   |   0.534 ms  |      0.097 ms      |    1 minute, 7 seconds   |N/A|
+| DELETE | Reqwest |   10,000    |   1.360 ms   |   21.140 ms  |   0.988 ms  |      0.492 ms      |   2 minutes, 16 seconds  |123% slower|
+| DELETE |  Hyper  |   10,000    |   1.382 ms   |   29.921 ms  |   0.842 ms  |      0.838 ms      |   2 minutes, 18 seconds  |126% slower|
+| DELETE |  Curio  |   10,000    |   0.611 ms   |   13.118 ms  |   0.455 ms  |      0.276 ms      |   1 minute, 1 second     |N/A|
