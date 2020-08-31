@@ -18,9 +18,3 @@ rustls = "0.18.1"
 webpki-roots = "0.20.0"
 webpki = "0.21.3"
 chunked_transfer = "1.2.0"
-url = "2.1.1"
-
-[dev-dependencies]
-reqwest = { version = "0.10.8", features = ["blocking"]}
-hyper = "0.13.7"
-tokio-test = "0.2.1"
