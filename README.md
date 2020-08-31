@@ -86,6 +86,9 @@ Sat 29th Aug 2020 - Curio 0.0.3 (preflight for 0.1.0) is completed, and preperat
 
 | Method | Library | Total Runs | Average Time | Highest Time | Lowest Time | Standard Deviation | Total Time |compared to Curio|
 |:------:|:-------:|:----------:|:------------:|:------------:|:-----------:|:------------------:|:----------:|:----:|
-|  GET   | Reqwest |   10000    |   7.475 ms   |   62.460 ms |   6.221 ms   |      1.966 ms      |   12 minutes, 27 seconds    | 1019% slower |
-|  GET   |  Hyper  |   10000    |   1.108 ms   |   11.78 ms  |   0.800 ms   |      0.425 ms      |   1 minute, 50 seconds    | 66% slower |
-|  GET   |  Curio  |   10000    |   0.668 ms   |   9.772 ms  |   0.523 ms   |      0.147 ms      |   1 minute, 6 seconds    | N/A |
+|  GET   | Reqwest |   10000    |   7.475 ms   |   62.460 ms  |   6.221 ms  |      1.966 ms      |   12 minutes, 27 seconds | 1019% slower |
+|  GET   |  Hyper  |   10000    |   1.108 ms   |   11.78 ms   |   0.800 ms  |      0.425 ms      |   1 minute, 50 seconds   | 66% slower |
+|  GET   |  Curio  |   10000    |   0.668 ms   |   9.772 ms   |   0.523 ms  |      0.147 ms      |   1 minute, 6 seconds    | N/A |
+|  POST  | Reqwest |   10000    |   1.348 ms   |   22.712 ms  |   1.064 ms  |       0.511 ms     |   2 minutes, 14 seconds  |99% slower|
+|  POST  |  Hyper  |   10000    |   1.138 ms   |   10.660 ms  |   0.839 ms  |       0.369 ms     |   1 minute, 53 seconds   |68% slower|
+|  POST  |  Curio  |   10000    |    0.676 ms  |   2.613 ms   |   0.534 ms  |       0.097 ms     |    1 minute 7 seconds    |N/A|
