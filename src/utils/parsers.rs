@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::structs::{Cookie, Header, HTTPVersion};
+use crate::structs::{Cookie, Header, HTTPtype};
 
 pub fn parse_cookie(line: String) -> Cookie {
     let formatted = line.split("Set-Cookie:").collect::<Vec<&str>>();
@@ -93,10 +93,10 @@ pub fn parse_header(line: String) -> Header {
     };
 }
 
-pub fn parse_url(url: &String) -> (HTTPVersion, String, String) {
-    let mut http = HTTPVersion::HTTP;
+pub fn parse_url(url: &String) -> (HTTPtype, String, String) {
+    let mut http = HTTPtype::HTTP;
     if url.contains("https") {
-        http = HTTPVersion::HTTPS;
+        http = HTTPtype::HTTPS;
     }
     let protless_url_vec = url.split(r"/^(?:https?:\/\/)/igm").collect::<Vec<&str>>();
     let protless_url = protless_url_vec.last().unwrap();

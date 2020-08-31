@@ -1,6 +1,7 @@
 use crate::utils;
 use std::collections::HashMap;
 use crate::utils::parsers;
+use std::net::TcpStream;
 
 pub(crate) mod errors;
 
@@ -19,11 +20,10 @@ pub enum RequestType {
 
 /// Defines the type of HTTP to be used in the request (TCP/TLS)
 #[derive(Debug, Clone)]
-pub enum HTTPVersion {
+pub enum HTTPtype {
     HTTP = 0,
     HTTPS = 1,
 }
-
 
 /// Build a request, without any of the knowledge of how HTTP works, this structure takes care of it all, and still follows specifications
 #[derive(Debug, Clone)]
@@ -39,7 +39,7 @@ pub struct Request {
     /// The protocol to use:
     /// This can be HTTP, or HTTPS
     /// If a server requests we use HTTPS, we will automatically switch over anyway, no fiddling needed
-    pub protocol: HTTPVersion,
+    pub protocol: HTTPtype,
     /// Not all requests have a body, this is an optional field containing a tuple value of both the encoding, and the body content
     pub body: Option<(String, String)>,
     /// This stores the values of each header you set within the request. This is the first step to authenticating a request
@@ -125,8 +125,13 @@ pub struct Cookie {
 }
 
 #[derive(Debug, Clone)]
-pub struct CurioConfig {
-    pub no_parse: bool
+pub struct ClientConfig {
+    pub no_parse: bool,
+    pub force_https: bool,
+    pub redirect_limit: u8,
+    pub auto_upgrade: bool,
+    pub max_queue_length: usize,
+    pub perform_preflight: bool
 }
 
 #[doc(hidden)]
@@ -319,7 +324,7 @@ impl Request {
     /// see any of the above examples for information on how to use this method.
     pub fn send(&self) -> Result<Response, Box<dyn std::error::Error>> {
         return match self.protocol {
-            HTTPVersion::HTTPS => {
+            HTTPtype::HTTPS => {
                 match self.request_type {
                     RequestType::GET => crate::tls::get(&self.domain, &self.path, false),
                     RequestType::HEAD => crate::tls::head(&self.domain, &self.path, false),
@@ -332,7 +337,7 @@ impl Request {
                     }
                 }
             }
-            HTTPVersion::HTTP => {
+            HTTPtype::HTTP => {
                 match self.request_type {
                     RequestType::GET => crate::tcp::get(&self.domain, &self.path),
                     RequestType::HEAD => crate::tcp::head(&self.domain, &self.path),
@@ -483,4 +488,19 @@ impl PostData {
         }
         return (body_type, form);
     }
+}
+
+pub struct Connection<'a> {
+    pub is_secure: bool,
+    pub domain: String,
+    pub port: usize,
+    pub stream: TcpStream,
+    pub tls: Option<rustls::Stream<'a, rustls::ClientSession, &'a mut TcpStream>>
+}
+
+pub struct Client {
+    pub global_headers: HashMap<String, String>,
+    pool: HashMap<u8, Connection>,
+    queue: Vec<Request>,
+    pub config: ClientConfig
 }
