@@ -131,7 +131,9 @@ pub struct ClientConfig {
     pub redirect_limit: u8,
     pub auto_upgrade: bool,
     pub max_queue_length: usize,
-    pub perform_preflight: bool
+    pub perform_preflight: bool,
+    pub connection_limit: u8,
+    pub cycle_connections: bool,
 }
 
 #[doc(hidden)]
@@ -495,12 +497,37 @@ pub struct Connection<'a> {
     pub domain: String,
     pub port: usize,
     pub stream: TcpStream,
-    pub tls: Option<rustls::Stream<'a, rustls::ClientSession, &'a mut TcpStream>>
+    pub tls: Option<rustls::Stream<'a, rustls::ClientSession, &'a mut TcpStream>>,
 }
 
-pub struct Client {
+pub struct Client<'a> {
     pub global_headers: HashMap<String, String>,
-    pool: HashMap<u8, Connection>,
+    pool: HashMap<u8, Connection<'a>>,
     queue: Vec<Request>,
-    pub config: ClientConfig
+    pub config: ClientConfig,
+}
+
+
+impl<'a> Client<'a> {
+    pub fn new() -> Client {
+        Client {
+            global_headers: HashMap::new(),
+            pool: HashMap::new(),
+            queue: vec!(),
+            config: ClientConfig {
+                no_parse: false,
+                force_https: false,
+                redirect_limit: 10,
+                auto_upgrade: true,
+                max_queue_length: 10,
+                perform_preflight: true,
+                connection_limit: 5,
+                cycle_connections: false
+            }
+        }
+    }
+
+    pub fn get<S: Into<String>>(&mut self, uri: S) -> Request {
+        Request::get(uri.into());
+    }
 }
