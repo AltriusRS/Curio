@@ -84,6 +84,8 @@ Sat 29th Aug 2020 - Curio 0.0.3 (preflight for 0.1.0) is completed, and preperat
 
 # Benchmarks
 
+You can help imrpvoe these benchmarks by looking into how we got these numbers in [this respository](https://github.com/fatalcenturion/curio-benchmarks)
+
 | Method | Library | Total Runs | Average Time | Highest Time | Lowest Time | Standard Deviation | Total Time |compared to Curio|
 |:------:|:-------:|:----------:|:------------:|:------------:|:-----------:|:------------------:|:----------:|:----:|
 |  GET   | Reqwest |   10,000    |   7.475 ms   |   62.460 ms  |   6.221 ms  |      1.966 ms      |   12 minutes, 27 seconds | 1019% slower |
