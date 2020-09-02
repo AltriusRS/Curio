@@ -71,3 +71,10 @@ fn test_request_smuggling() {
     println!("{:#?}", res.headers);
     assert_eq!(res.headers.get("Transfer-Encoding"), None)
 }
+
+#[test]
+fn test_url_parsing() {
+    let r = crate::prelude::Request::get("http://localhost:100/path/to.resource");
+    println!("{:#?}", r);
+    assert_eq!(1,1)
+}

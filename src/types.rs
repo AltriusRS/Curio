@@ -149,7 +149,7 @@ impl fmt::Display for Error {
             Error::E451UnavailableForLegalReasons => f.write_str("HTTP 451 - Unavailable For Legal Reasons"),
             Error::E500InternalServerError => f.write_str("HTTP 500 - Internal Server Error"),
             Error::E501NotImplemented => f.write_str("HTTP 501 - Not Implemented"),
-            _ => {}
+            _ => f.write_str("Unknown Error - Curio does not have a definition for this error")
         }
     }
 }
@@ -191,7 +191,7 @@ impl StdError for Error {
             Error::E451UnavailableForLegalReasons => "The server operator has received a legal demand to deny access to a resource, or set of resources including this resource.",
             Error::E500InternalServerError => "The server encountered an error and was unable to process the request",
             Error::E501NotImplemented => "The server either does not recognize the request method, or lacks the ability to fulfill the request. (this usually implies it will be available in the future)",
-            _ => {}
+            _ => "The error code is not implemented, try reading up, the log should be written there."
         }
     }
 }

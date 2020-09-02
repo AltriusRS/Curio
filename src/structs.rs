@@ -31,6 +31,8 @@ pub struct Request {
     pub url_string: String,
     /// The domain of the server to connect to
     pub domain: String,
+    /// The port to attempt connection to (default: 80 for HTTP, 443 for HTTPS)
+    pub port: usize,
     /// The path to target our requests at
     pub path: String,
     /// The protocol to use:
@@ -155,12 +157,13 @@ impl Request {
     /// ```
     pub fn get<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parsers::parse_url(&url_string);
+        let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::GET,
             url_string,
             domain,
+            port,
             path,
             protocol,
             body: None,
@@ -184,12 +187,13 @@ impl Request {
     /// ```
     pub fn head<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parsers::parse_url(&url_string);
+        let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::HEAD,
             url_string,
             domain,
+            port,
             path,
             protocol,
             body: None,
@@ -212,12 +216,13 @@ impl Request {
     /// ```
     pub fn delete<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parsers::parse_url(&url_string);
+        let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::DELETE,
             url_string,
             domain,
+            port,
             path,
             protocol,
             body: None,
@@ -240,12 +245,13 @@ impl Request {
     /// ```
     pub fn options<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parsers::parse_url(&url_string);
+        let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::OPTIONS,
             url_string,
             domain,
+            port,
             path,
             protocol,
             body: None,
@@ -275,12 +281,13 @@ impl Request {
     /// ```
     pub fn post<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parsers::parse_url(&url_string);
+        let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::POST,
             url_string,
             domain,
+            port,
             path,
             protocol,
             body: None,
@@ -321,11 +328,11 @@ impl Request {
 
     /// The `send` method is used to deserialize and send the resulting request to the destination, it uses a series of checks to confirm that it is doing what you want it to do
     /// see any of the above examples for information on how to use this method.
-    pub fn send(&self, conn: &mut Connection) -> Result<Response, Box<dyn std::error::Error>> {
+    pub fn send(&self/*,conn: &mut Connection //This is for the alpha branch*/) -> Result<Response, Box<dyn std::error::Error>> {
         return match self.protocol {
             HTTPtype::HTTPS => {
                 match self.request_type {
-                    RequestType::GET => crate::client::get(conn, self, false),
+                    RequestType::GET => crate::tls::get(&self.domain, &self.path, false),
                     RequestType::HEAD => crate::tls::head(&self.domain, &self.path, false),
                     RequestType::OPTIONS => crate::tls::options(&self.domain, &self.path, false),
                     RequestType::DELETE => crate::tls::delete(&self.domain, &self.path, false),
@@ -540,7 +547,7 @@ impl<'a> Client<'a> {
     }
 
     pub fn get<S: Into<String>>(&mut self, uri: S) -> Request {
-        Request::get(uri.into());
+        Request::get(uri.into())
     }
 
     pub fn post<S: Into<String>>(&mut self, uri: S, body: &PostData) -> Request {
@@ -550,15 +557,15 @@ impl<'a> Client<'a> {
     }
 
     pub fn delete<S: Into<String>>(&mut self, uri: S) -> Request {
-        Request::delete(uri.into());
+        Request::delete(uri.into())
     }
 
     pub fn head<S: Into<String>>(&mut self, uri: S) -> Request {
-        Request::head(uri.into());
+        Request::head(uri.into())
     }
 
     pub fn options<S: Into<String>>(&mut self, uri: S) -> Request {
-        Request::options(uri.into());
+        Request::options(uri.into())
     }
 
     //pub fn connect

@@ -93,7 +93,7 @@ pub fn parse_header(line: String) -> Header {
     };
 }
 
-pub fn parse_url(url: &String) -> (HTTPtype, String, String) {
+pub fn parse_url(url: &String) -> (HTTPtype, String, usize, String) {
     let mut http = HTTPtype::HTTP;
     if url.contains("https") {
         http = HTTPtype::HTTPS;
@@ -104,8 +104,24 @@ pub fn parse_url(url: &String) -> (HTTPtype, String, String) {
     url_parts.reverse();
     url_parts.pop();
     url_parts.pop();
-    let domain = url_parts.pop().unwrap();
+    let domain_str = url_parts.pop().unwrap();
+
+    let mut port: usize = match http {
+        HTTPtype::HTTP => 80,
+        HTTPtype::HTTPS => 443,
+    };
+
+    let mut domain: String = String::new();
+
+    if domain_str.contains(":") {
+        let mut domain_components = domain_str.split(":").collect::<Vec<&str>>();
+        port = domain_components.pop().unwrap().parse().unwrap();
+        domain = domain_components.join("");
+    } else {
+        domain = domain_str.to_string()
+    }
+
     url_parts.reverse();
     let path = format!("/{}", url_parts.join("/"));
-    return (http, domain.to_string(), path);
+    return (http, domain, port, path);
 }
