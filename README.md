@@ -88,11 +88,11 @@ You can help imrpove these benchmarks by looking into how we got these numbers i
 
 | Method | Library | Total Runs | Average Time | Highest Time | Lowest Time | Standard Deviation | Total Time |compared to Curio|
 |:------:|:-------:|:----------:|:------------:|:------------:|:-----------:|:------------------:|:----------:|:----:|
-|  GET   | Reqwest |   10,000    |   7.475 ms   |   62.460 ms  |   6.221 ms  |      1.966 ms      |   12 minutes, 27 seconds | 1019% slower |
-|  GET   |  Hyper  |   10,000    |   1.108 ms   |   11.78 ms   |   0.800 ms  |      0.425 ms      |   1 minute, 50 seconds   | 66% slower |
+|  GET   | Reqwest |   10,000    |   1.311 ms   |   18.802 ms  |   0.938 ms  |      0.411 ms      |   2 minutes, 11 seconds  | 198% slower |
+|  GET   |  Hyper  |   10,000    |   1.108 ms   |   11.78 ms   |   0.800 ms  |      0.425 ms      |   1 minute, 50 seconds   | 166% slower |
 |  GET   |  Curio  |   10,000    |   0.668 ms   |   9.772 ms   |   0.523 ms  |      0.147 ms      |   1 minute, 6 seconds    | N/A |
-|  POST  | Reqwest |   10,000    |   1.348 ms   |   22.712 ms  |   1.064 ms  |      0.511 ms      |   2 minutes, 14 seconds  |99% slower|
-|  POST  |  Hyper  |   10,000    |   1.138 ms   |   10.660 ms  |   0.839 ms  |      0.369 ms      |   1 minute, 53 seconds   |68% slower|
+|  POST  | Reqwest |   10,000    |   1.348 ms   |   22.712 ms  |   1.064 ms  |      0.511 ms      |   2 minutes, 14 seconds  |199% slower|
+|  POST  |  Hyper  |   10,000    |   1.138 ms   |   10.660 ms  |   0.839 ms  |      0.369 ms      |   1 minute, 53 seconds   |168% slower|
 |  POST  |  Curio  |   10,000    |   0.676 ms   |   2.613 ms   |   0.534 ms  |      0.097 ms      |    1 minute, 7 seconds   |N/A|
 | DELETE | Reqwest |   10,000    |   1.360 ms   |   21.140 ms  |   0.988 ms  |      0.492 ms      |   2 minutes, 16 seconds  |123% slower|
 | DELETE |  Hyper  |   10,000    |   1.382 ms   |   29.921 ms  |   0.842 ms  |      0.838 ms      |   2 minutes, 18 seconds  |126% slower|
