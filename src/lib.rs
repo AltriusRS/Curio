@@ -94,8 +94,8 @@
 //! }
 //! ```
 
-//#[doc(hidden)]
-//pub mod types;
+#[doc(hidden)]
+pub mod types;
 
 #[doc(hidden)]
 pub mod tls;
