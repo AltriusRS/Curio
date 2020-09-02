@@ -1,2 +1,2 @@
-pub use crate::structs::{Client, Request, Response, PostData};
-pub use crate::types::{Error};
+pub use crate::structs::{Request, Response, PostData};
+//pub use crate::types::{Error};
