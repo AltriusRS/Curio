@@ -2,6 +2,10 @@ use crate::utils;
 use std::collections::HashMap;
 use crate::utils::parsers;
 use std::net::TcpStream;
+use webpki::DNSNameRef;
+use std::sync::Arc;
+use rustls::ClientSession;
+use webpki_roots::TLS_SERVER_ROOTS;
 
 /// Defines the method to be used in the request
 #[derive(Debug, Clone)]
@@ -326,6 +330,16 @@ impl Request {
         self
     }
 
+    pub fn new_send(&self, conn: &mut Connection) -> crate::types::Result<Response> {
+        return match self.request_type {
+            RequestType::GET => crate::client::get(conn, &self),
+            _ => {
+                println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
+                crate::client::get(conn, &self)
+            }
+        };
+    }
+
     /// The `send` method is used to deserialize and send the resulting request to the destination, it uses a series of checks to confirm that it is doing what you want it to do
     /// see any of the above examples for information on how to use this method.
     pub fn send(&self/*,conn: &mut Connection //This is for the alpha branch*/) -> Result<Response, Box<dyn std::error::Error>> {
@@ -501,13 +515,44 @@ pub struct Connection<'a> {
     pub domain: String,
     pub port: usize,
     pub in_use: bool,
-    pub stream: TcpStream,
-    pub tls: Option<rustls::Stream<'a, rustls::ClientSession, &'a mut TcpStream>>,
+    pub stream: Option<TcpStream>,
+    pub tls: Option<rustls::Stream<'a, rustls::ClientSession, TcpStream>>,
+}
+
+impl<'a> Connection<'a> {
+    pub fn new(domain: String, port: usize) -> Connection<'a> {
+        let mut conn = Connection {
+            is_secure: false,
+            domain,
+            port,
+            in_use: false,
+            stream: None,
+            tls: None,
+        };
+        conn.stream.unwrap().set_nodelay(true);
+        return conn;
+    }
+
+    pub fn connect(&mut self) {
+        let mut con = TcpStream::connect(format!("{}:{}", domain, port)).unwrap();
+        con.set_nodelay(true);
+        self.stream = Some(con)
+    }
+
+    pub fn upgrade<'b>(&mut self) {
+        let config = Arc::new(build_tls_config());
+        let domain_ref = DNSNameRef::try_from_ascii_str(self.domain.as_str()).unwrap();
+        let mut client: ClientSession = ClientSession::new(&config, domain_ref);
+        let mut stream = rustls::Stream::new(&mut client, &mut TcpStream::connect(format!("{}:{}", domain, port)).unwrap());
+        self.is_secure = true;
+        self.tls = Some(stream);
+    }
 }
 
 pub struct Client<'a> {
     pub global_headers: HashMap<String, String>,
     pool: HashMap<u8, Connection<'a>>,
+    pool_ref: HashMap<u8, bool>,
     pub config: ClientConfig,
 }
 
@@ -517,6 +562,7 @@ impl<'a> Client<'a> {
         Client {
             global_headers: HashMap::new(),
             pool: HashMap::new(),
+            pool_ref: HashMap::new(),
             config: ClientConfig {
                 no_parse: false,
                 force_https: false,
@@ -530,20 +576,32 @@ impl<'a> Client<'a> {
         }
     }
 
-    fn send(mut self, request: Request) {
-        if self.pool.len() == 0 {
+    fn send(mut self, request: Request) -> crate::types::Result<Response> {
+        return if self.pool.len() == 0 {
             println!("{:#?}", request);
-            // let connection = Connection {
-            //     is_secure: false,
-            //     domain: request.domain,
-            //     port: 80,
-            //     in_use: false,
-            //     stream: TcpStream(format!("{}:{}", self.domain, self.port)),
-            //     tls: None,
-            // };
-            // self.pool.insert(1, connection);
-            // request.send(self.pool.get_mut(&1).unwrap());
-        }
+            let mut connection = Connection::new(request.domain, request.port);
+            match request.protocol {
+                HTTPtype::HTTPS => connection.upgrade(),
+                _ => connection.connect()
+            }
+            self.pool.insert(1, connection);
+            self.pool_ref.insert(1, true);
+            let req = request.new_send(self.pool.get_mut(&1).unwrap());
+            self.pool_ref.insert(1, false);
+            req
+        } else {
+            let mut first_free = 1;
+            for (id, busy) in self.pool_ref {
+                if id < first_free && !busy {
+                    first_free = id;
+                    break;
+                }
+            }
+            self.pool_ref.insert(first_free.clone(), true);
+            let req = request.new_send(self.pool.get_mut(&first_free).unwrap());
+            self.pool_ref.insert(first_free, false);
+            req
+        };
     }
 
     pub fn get<S: Into<String>>(&mut self, uri: S) -> Request {
@@ -569,4 +627,10 @@ impl<'a> Client<'a> {
     }
 
     //pub fn connect
+}
+
+fn build_tls_config() -> rustls::ClientConfig {
+    let mut cfg = rustls::ClientConfig::new();
+    cfg.root_store.add_server_trust_anchors(&TLS_SERVER_ROOTS);
+    cfg
 }

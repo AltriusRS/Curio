@@ -1,3 +1,4 @@
+#![forbid(unsafe_code)]
 //! # Curio
 //!
 //! A blazing fast HTTP client.
