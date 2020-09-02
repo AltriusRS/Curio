@@ -86,14 +86,17 @@ Sat 29th Aug 2020 - Curio 0.0.3 (preflight for 0.1.0) is completed, and preperat
 
 You can help imrpove these benchmarks by looking into how we got these numbers in [this respository](https://github.com/fatalcenturion/curio-benchmarks)
 
-| Method | Library | Total Runs | Average Time | Highest Time | Lowest Time | Standard Deviation | Total Time |compared to Curio|
-|:------:|:-------:|:----------:|:------------:|:------------:|:-----------:|:------------------:|:----------:|:----:|
-|  GET   | Reqwest |   10,000    |   1.311 ms   |   18.802 ms  |   0.938 ms  |      0.411 ms      |   2 minutes, 11 seconds  | 198% slower |
-|  GET   |  Hyper  |   10,000    |   1.108 ms   |   11.78 ms   |   0.800 ms  |      0.425 ms      |   1 minute, 50 seconds   | 166% slower |
-|  GET   |  Curio  |   10,000    |   0.668 ms   |   9.772 ms   |   0.523 ms  |      0.147 ms      |   1 minute, 6 seconds    | N/A |
-|  POST  | Reqwest |   10,000    |   1.348 ms   |   22.712 ms  |   1.064 ms  |      0.511 ms      |   2 minutes, 14 seconds  |199% slower|
-|  POST  |  Hyper  |   10,000    |   1.138 ms   |   10.660 ms  |   0.839 ms  |      0.369 ms      |   1 minute, 53 seconds   |168% slower|
-|  POST  |  Curio  |   10,000    |   0.676 ms   |   2.613 ms   |   0.534 ms  |      0.097 ms      |    1 minute, 7 seconds   |N/A|
-| DELETE | Reqwest |   10,000    |   1.360 ms   |   21.140 ms  |   0.988 ms  |      0.492 ms      |   2 minutes, 16 seconds  |123% slower|
-| DELETE |  Hyper  |   10,000    |   1.382 ms   |   29.921 ms  |   0.842 ms  |      0.838 ms      |   2 minutes, 18 seconds  |126% slower|
-| DELETE |  Curio  |   10,000    |   0.611 ms   |   13.118 ms  |   0.455 ms  |      0.276 ms      |   1 minute, 1 second     |N/A|
+| Method |  Library  | Total Runs | Average Time |  Highest Time  | Lowest Time | Standard Deviation | Total Time |compared to Curio|
+|:------:|:---------:|:----------:|:------------:|:--------------:|:-----------:|:------------------:|:----------:|:----:|
+|  GET   |   Hyper   |   10,000   |   1.379 ms    |   16.809 ms   |  0.858 ms   |     0.755 ms       |   2 minutes, 17 seconds    |428% slower|
+|  GET   | attohttpc |   10,000   |   0.406 ms    |   14.194 ms   |  0.251 ms   |     0.292 ms       |   40 seconds    |125%s slower|
+|  GET   |  Reqwest  |   10,000   |   1.471 us    |   20.718 ms   |  0.987 ms   |     0.678 ms       |   2 minutes, 27 seconds    |522% slower|
+|  GET   |   Curio   |   10,000   |   0.323 us    |    6.472 ms   |  0.237 ms   |     0.128 ms       |    32 seconds    |N/A|
+|  POST  |   Hyper   |   10,000   |   1.701 ms    |   25.361 ms   |  0.869 ms   |     1.558 ms       |   2 minutes, 50 seconds    |246% slower|
+|  POST  | attohttpc |   10,000   |   0.458 ms    |    8.523 ms   |  0.266 ms   |     0.326 ms       |    45 seconds    |153% faster|
+|  POST  |  Reqwest  |   10,000   |   1.775 ms    |   25.757 ms   |  1.071 ms   |     1.206 ms       |   2 minutes, 57 seconds    |257% slower|
+|  POST  |   Curio   |   10,000   |   0.693 ms    |    5.190 ms   |  0.520 ms   |     0.157 ms       |    1 minute, 9 seconds    |N/A|
+| DELETE |   Hyper   |   10,000   |   1.770 ms    |   24.764 ms   |  0.870 ms   |     1.545 ms       |   2 minutes 57 seconds    |311% slower|
+| DELETE | attohttpc |   10,000   |   0.344 ms    |    3.658 ms   |  0.243 ms   |     0.890 ms        |    34 seconds    |167% faster|
+| DELETE |  Reqwest  |   10,000   |   1.493 ms    |   15.187 ms   |  1.031 ms   |     0.767 ms       |   2 minutes 29 seconds    |261% slower|
+| DELETE |   Curio   |   10,000   |   0.578 ms    |    4.598 ms   |  0.450 ms   |     0.129 ms       |    57 seconds    |N/A|
