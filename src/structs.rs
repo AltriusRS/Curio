@@ -1,11 +1,13 @@
 use crate::utils;
 use std::collections::HashMap;
 use crate::utils::parsers;
-use std::net::TcpStream;
+use std::net::{TcpStream, SocketAddr};
 use webpki::DNSNameRef;
 use std::sync::Arc;
 use rustls::ClientSession;
 use webpki_roots::TLS_SERVER_ROOTS;
+use std::str::FromStr;
+use std::time::Duration;
 
 /// Defines the method to be used in the request
 #[derive(Debug, Clone)]
@@ -520,32 +522,40 @@ pub struct Connection<'a> {
 }
 
 impl<'a> Connection<'a> {
-    pub fn new(domain: String, port: usize) -> Connection<'a> {
-        let mut conn = Connection {
+
+    fn lookup(domain: &String) -> SocketAddr {
+        SocketAddr::from_str(domain.as_str()).unwrap()
+    }
+
+    pub fn connect(domain: &String, port: &usize) -> Connection<'a> {
+        let mut stream = TcpStream::connect_timeout(&Connection::lookup(&format!("{}:{}", domain, port)), Duration::new(20, 0)).unwrap();
+        stream.set_nodelay(true);
+        return Connection {
             is_secure: false,
-            domain,
-            port,
+            domain: domain.clone(),
+            port: port.clone(),
             in_use: false,
             stream: None,
             tls: None,
         };
-        conn.stream.unwrap().set_nodelay(true);
-        return conn;
     }
 
-    pub fn connect(&mut self) {
-        let mut con = TcpStream::connect(format!("{}:{}", domain, port)).unwrap();
+    pub fn upgrade<'b>(domain: &String, port: &usize) -> Connection<'a> {
+        let mut con = TcpStream::connect_timeout(&Connection::lookup(&format!("{}:{}", domain, port)), Duration::new(20, 0)).unwrap();
         con.set_nodelay(true);
-        self.stream = Some(con)
-    }
 
-    pub fn upgrade<'b>(&mut self) {
         let config = Arc::new(build_tls_config());
-        let domain_ref = DNSNameRef::try_from_ascii_str(self.domain.as_str()).unwrap();
+        let domain_ref = DNSNameRef::try_from_ascii_str(domain.as_str()).unwrap();
         let mut client: ClientSession = ClientSession::new(&config, domain_ref);
-        let mut stream = rustls::Stream::new(&mut client, &mut TcpStream::connect(format!("{}:{}", domain, port)).unwrap());
-        self.is_secure = true;
-        self.tls = Some(stream);
+        let mut stream = rustls::Stream::new(&mut client, &mut con.try_clone().unwrap());
+        return Connection {
+            is_secure: true,
+            domain: domain.clone(),
+            port: port.clone(),
+            in_use: false,
+            stream: None,
+            tls: Some(stream),
+        };
     }
 }
 
@@ -579,19 +589,18 @@ impl<'a> Client<'a> {
     fn send(mut self, request: Request) -> crate::types::Result<Response> {
         return if self.pool.len() == 0 {
             println!("{:#?}", request);
-            let mut connection = Connection::new(request.domain, request.port);
-            match request.protocol {
-                HTTPtype::HTTPS => connection.upgrade(),
-                _ => connection.connect()
-            }
+            let mut connection = match request.protocol {
+                HTTPtype::HTTPS => Connection::upgrade(&request.domain, &request.port),
+                _ => Connection::connect(&request.domain, &request.port)
+            };
             self.pool.insert(1, connection);
             self.pool_ref.insert(1, true);
-            let req = request.new_send(self.pool.get_mut(&1).unwrap());
+            let req = request.new_send(&mut self.pool.get_mut(&1).unwrap());
             self.pool_ref.insert(1, false);
             req
         } else {
             let mut first_free = 1;
-            for (id, busy) in self.pool_ref {
+            for (id, busy) in self.pool_ref.clone() {
                 if id < first_free && !busy {
                     first_free = id;
                     break;
