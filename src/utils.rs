@@ -56,7 +56,7 @@ pub fn new_response(body_text: String, mut head: Vec<String>) -> Response {
 /*pub fn parse_err_reason(reason: String) -> crate::types::Error {
     if reason == "Method not allowed".to_string() {
         crate::types::Error::CrossOriginResourceMethodDisallowed
-    } else /*if reason == "Origin not allowed".to_string()\*\/ {
+    } else {
         crate::types::Error::CrossOriginResourceOriginDisallowed
     }
 }*/
