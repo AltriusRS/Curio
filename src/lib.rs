@@ -94,8 +94,8 @@
 //! }
 //! ```
 
-#[doc(hidden)]
-pub mod types;
+//#[doc(hidden)]
+//pub mod types;
 
 #[doc(hidden)]
 pub mod tls;
@@ -103,7 +103,7 @@ pub mod tls;
 #[doc(hidden)]
 pub mod tcp;
 
-pub mod client;
+//pub mod client;
 
 pub mod structs;
 
