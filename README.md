@@ -89,7 +89,7 @@ You can help imrpove these benchmarks by looking into how we got these numbers i
 | Method |  Library  | Total Runs | Average Time |  Highest Time  | Lowest Time | Standard Deviation | Total Time |compared to Curio|
 |:------:|:---------:|:----------:|:------------:|:--------------:|:-----------:|:------------------:|:----------:|:----:|
 |  GET   |   Hyper   |   10,000   |   1.379 ms    |   16.809 ms   |  0.858 ms   |     0.755 ms       |   2 minutes, 17 seconds    |428% slower|
-|  GET   | attohttpc |   10,000   |   0.406 ms    |   14.194 ms   |  0.251 ms   |     0.292 ms       |   40 seconds    |125%s slower|
+|  GET   | attohttpc |   10,000   |   0.406 ms    |   14.194 ms   |  0.251 ms   |     0.292 ms       |   40 seconds    |125% slower|
 |  GET   |  Reqwest  |   10,000   |   1.471 ms    |   20.718 ms   |  0.987 ms   |     0.678 ms       |   2 minutes, 27 seconds    |522% slower|
 |  GET   |   Curio   |   10,000   |   0.323 ms    |    6.472 ms   |  0.237 ms   |     0.128 ms       |    32 seconds    |N/A|
 |  POST  |   Hyper   |   10,000   |   1.701 ms    |   25.361 ms   |  0.869 ms   |     1.558 ms       |   2 minutes, 50 seconds    |246% slower|
