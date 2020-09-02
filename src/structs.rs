@@ -1,9 +1,7 @@
 use crate::utils;
 use std::collections::HashMap;
 use crate::utils::parsers;
-
-pub(crate) mod errors;
-
+use std::net::TcpStream;
 
 /// Defines the method to be used in the request
 #[derive(Debug, Clone)]
@@ -19,11 +17,10 @@ pub enum RequestType {
 
 /// Defines the type of HTTP to be used in the request (TCP/TLS)
 #[derive(Debug, Clone)]
-pub enum HTTPVersion {
+pub enum HTTPtype {
     HTTP = 0,
     HTTPS = 1,
 }
-
 
 /// Build a request, without any of the knowledge of how HTTP works, this structure takes care of it all, and still follows specifications
 #[derive(Debug, Clone)]
@@ -34,12 +31,14 @@ pub struct Request {
     pub url_string: String,
     /// The domain of the server to connect to
     pub domain: String,
+    /// The port to attempt connection to (default: 80 for HTTP, 443 for HTTPS)
+    pub port: usize,
     /// The path to target our requests at
     pub path: String,
     /// The protocol to use:
     /// This can be HTTP, or HTTPS
     /// If a server requests we use HTTPS, we will automatically switch over anyway, no fiddling needed
-    pub protocol: HTTPVersion,
+    pub protocol: HTTPtype,
     /// Not all requests have a body, this is an optional field containing a tuple value of both the encoding, and the body content
     pub body: Option<(String, String)>,
     /// This stores the values of each header you set within the request. This is the first step to authenticating a request
@@ -96,9 +95,9 @@ pub struct Response {
 #[derive(Debug, Clone)]
 pub struct Header {
     /// The name of the header (Key)
-    pub name: Option<String>,
+    pub name: String,
     /// The content of the header (Value)
-    pub value: Option<String>,
+    pub value: String,
 }
 
 /// The structure used for storing Cookies and their configuration
@@ -125,8 +124,15 @@ pub struct Cookie {
 }
 
 #[derive(Debug, Clone)]
-pub struct CurioConfig {
-    pub no_parse: bool
+pub struct ClientConfig {
+    pub no_parse: bool,
+    pub force_https: bool,
+    pub redirect_limit: u8,
+    pub auto_upgrade: bool,
+    pub max_queue_length: usize,
+    pub perform_preflight: bool,
+    pub connection_limit: u8,
+    pub cycle_connections: bool,
 }
 
 #[doc(hidden)]
@@ -151,12 +157,13 @@ impl Request {
     /// ```
     pub fn get<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parsers::parse_url(&url_string);
+        let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::GET,
             url_string,
             domain,
+            port,
             path,
             protocol,
             body: None,
@@ -180,12 +187,13 @@ impl Request {
     /// ```
     pub fn head<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parsers::parse_url(&url_string);
+        let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::HEAD,
             url_string,
             domain,
+            port,
             path,
             protocol,
             body: None,
@@ -208,12 +216,13 @@ impl Request {
     /// ```
     pub fn delete<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parsers::parse_url(&url_string);
+        let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::DELETE,
             url_string,
             domain,
+            port,
             path,
             protocol,
             body: None,
@@ -236,12 +245,13 @@ impl Request {
     /// ```
     pub fn options<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parsers::parse_url(&url_string);
+        let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::OPTIONS,
             url_string,
             domain,
+            port,
             path,
             protocol,
             body: None,
@@ -271,12 +281,13 @@ impl Request {
     /// ```
     pub fn post<A: Into<String>>(url: A) -> Request {
         let url_string = url.into();
-        let (protocol, domain, path) = parsers::parse_url(&url_string);
+        let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
             request_type: RequestType::POST,
             url_string,
             domain,
+            port,
             path,
             protocol,
             body: None,
@@ -317,9 +328,9 @@ impl Request {
 
     /// The `send` method is used to deserialize and send the resulting request to the destination, it uses a series of checks to confirm that it is doing what you want it to do
     /// see any of the above examples for information on how to use this method.
-    pub fn send(&self) -> Result<Response, Box<dyn std::error::Error>> {
+    pub fn send(&self/*,conn: &mut Connection //This is for the alpha branch*/) -> Result<Response, Box<dyn std::error::Error>> {
         return match self.protocol {
-            HTTPVersion::HTTPS => {
+            HTTPtype::HTTPS => {
                 match self.request_type {
                     RequestType::GET => crate::tls::get(&self.domain, &self.path, false),
                     RequestType::HEAD => crate::tls::head(&self.domain, &self.path, false),
@@ -332,7 +343,7 @@ impl Request {
                     }
                 }
             }
-            HTTPVersion::HTTP => {
+            HTTPtype::HTTP => {
                 match self.request_type {
                     RequestType::GET => crate::tcp::get(&self.domain, &self.path),
                     RequestType::HEAD => crate::tcp::head(&self.domain, &self.path),
@@ -483,4 +494,79 @@ impl PostData {
         }
         return (body_type, form);
     }
+}
+
+pub struct Connection<'a> {
+    pub is_secure: bool,
+    pub domain: String,
+    pub port: usize,
+    pub in_use: bool,
+    pub stream: TcpStream,
+    pub tls: Option<rustls::Stream<'a, rustls::ClientSession, &'a mut TcpStream>>,
+}
+
+pub struct Client<'a> {
+    pub global_headers: HashMap<String, String>,
+    pool: HashMap<u8, Connection<'a>>,
+    pub config: ClientConfig,
+}
+
+
+impl<'a> Client<'a> {
+    pub fn new() -> Client<'a> {
+        Client {
+            global_headers: HashMap::new(),
+            pool: HashMap::new(),
+            config: ClientConfig {
+                no_parse: false,
+                force_https: false,
+                redirect_limit: 10,
+                auto_upgrade: true,
+                max_queue_length: 10,
+                perform_preflight: true,
+                connection_limit: 5,
+                cycle_connections: false,
+            },
+        }
+    }
+
+    fn send(mut self, request: Request) {
+        if self.pool.len() == 0 {
+            println!("{:#?}", request);
+            // let connection = Connection {
+            //     is_secure: false,
+            //     domain: request.domain,
+            //     port: 80,
+            //     in_use: false,
+            //     stream: TcpStream(format!("{}:{}", self.domain, self.port)),
+            //     tls: None,
+            // };
+            // self.pool.insert(1, connection);
+            // request.send(self.pool.get_mut(&1).unwrap());
+        }
+    }
+
+    pub fn get<S: Into<String>>(&mut self, uri: S) -> Request {
+        Request::get(uri.into())
+    }
+
+    pub fn post<S: Into<String>>(&mut self, uri: S, body: &PostData) -> Request {
+        let mut r = Request::post(uri.into());
+        r.set_body(body);
+        return r;
+    }
+
+    pub fn delete<S: Into<String>>(&mut self, uri: S) -> Request {
+        Request::delete(uri.into())
+    }
+
+    pub fn head<S: Into<String>>(&mut self, uri: S) -> Request {
+        Request::head(uri.into())
+    }
+
+    pub fn options<S: Into<String>>(&mut self, uri: S) -> Request {
+        Request::options(uri.into())
+    }
+
+    //pub fn connect
 }

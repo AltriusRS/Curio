@@ -26,7 +26,7 @@ pub fn new_response(body_text: String, mut head: Vec<String>) -> Response {
             cookies.insert(cookie.name.clone().unwrap(), cookie);
         } else {
             let header = parse_header(line);
-            headers.insert(header.name.unwrap(), header.value.unwrap());
+            headers.insert(header.name, header.value);
         }
     }
 
@@ -53,10 +53,10 @@ pub fn new_response(body_text: String, mut head: Vec<String>) -> Response {
     }
 }
 
-pub fn parse_err_reason(reason: String) -> crate::structs::errors::Error {
+pub fn parse_err_reason(reason: String) -> crate::types::Error {
     if reason == "Method not allowed".to_string() {
-        crate::structs::errors::Error::CrossOriginResourceMethodDisallowed
+        crate::types::Error::CrossOriginResourceMethodDisallowed
     } else /*if reason == "Origin not allowed".to_string()*/ {
-        crate::structs::errors::Error::CrossOriginResourceOriginDisallowed
+        crate::types::Error::CrossOriginResourceOriginDisallowed
     }
 }
