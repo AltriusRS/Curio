@@ -90,13 +90,13 @@ You can help imrpove these benchmarks by looking into how we got these numbers i
 |:------:|:---------:|:----------:|:------------:|:--------------:|:-----------:|:------------------:|:----------:|:----:|
 |  GET   |   Hyper   |   10,000   |   1.379 ms    |   16.809 ms   |  0.858 ms   |     0.755 ms       |   2 minutes, 17 seconds    |428% slower|
 |  GET   | attohttpc |   10,000   |   0.406 ms    |   14.194 ms   |  0.251 ms   |     0.292 ms       |   40 seconds    |125%s slower|
-|  GET   |  Reqwest  |   10,000   |   1.471 us    |   20.718 ms   |  0.987 ms   |     0.678 ms       |   2 minutes, 27 seconds    |522% slower|
-|  GET   |   Curio   |   10,000   |   0.323 us    |    6.472 ms   |  0.237 ms   |     0.128 ms       |    32 seconds    |N/A|
+|  GET   |  Reqwest  |   10,000   |   1.471 ms    |   20.718 ms   |  0.987 ms   |     0.678 ms       |   2 minutes, 27 seconds    |522% slower|
+|  GET   |   Curio   |   10,000   |   0.323 ms    |    6.472 ms   |  0.237 ms   |     0.128 ms       |    32 seconds    |N/A|
 |  POST  |   Hyper   |   10,000   |   1.701 ms    |   25.361 ms   |  0.869 ms   |     1.558 ms       |   2 minutes, 50 seconds    |246% slower|
 |  POST  | attohttpc |   10,000   |   0.458 ms    |    8.523 ms   |  0.266 ms   |     0.326 ms       |    45 seconds    |153% faster|
 |  POST  |  Reqwest  |   10,000   |   1.775 ms    |   25.757 ms   |  1.071 ms   |     1.206 ms       |   2 minutes, 57 seconds    |257% slower|
 |  POST  |   Curio   |   10,000   |   0.693 ms    |    5.190 ms   |  0.520 ms   |     0.157 ms       |    1 minute, 9 seconds    |N/A|
 | DELETE |   Hyper   |   10,000   |   1.770 ms    |   24.764 ms   |  0.870 ms   |     1.545 ms       |   2 minutes 57 seconds    |311% slower|
-| DELETE | attohttpc |   10,000   |   0.344 ms    |    3.658 ms   |  0.243 ms   |     0.890 ms        |    34 seconds    |167% faster|
+| DELETE | attohttpc |   10,000   |   0.344 ms    |    3.658 ms   |  0.243 ms   |     0.890 ms       |    34 seconds    |167% faster|
 | DELETE |  Reqwest  |   10,000   |   1.493 ms    |   15.187 ms   |  1.031 ms   |     0.767 ms       |   2 minutes 29 seconds    |261% slower|
 | DELETE |   Curio   |   10,000   |   0.578 ms    |    4.598 ms   |  0.450 ms   |     0.129 ms       |    57 seconds    |N/A|
