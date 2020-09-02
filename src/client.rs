@@ -1,6 +1,6 @@
 use crate::structs::{Connection, Response};
-use std::error::Error;
+use crate::types::Result as CurioResult;
 
-pub fn get(connection: &Connection, ) -> Result<Response, Box<dyn Error>> {
+pub fn get(connection: &Connection, ) -> CurioResult<Response> {
 
 }

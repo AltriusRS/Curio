@@ -5,108 +5,108 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
-    EXXXUnknownError,
     //Any error which is not represented here.
+    EXXXUnknownError,
 
-    E400BadRequest,
     //Server cannot or will not process the request due to a client error.
+    E400BadRequest,
 
-    E401Unauthorized,
     //403 except for if the authentication is invalid.
+    E401Unauthorized,
 
-    E402PaymentRequired,
     //Reserved for future use, it was supposed ot be used in a digital cash scheme.
+    E402PaymentRequired,
 
-    E403Forbidden,
     //The client is not allowed to make this request due to permission limitations.
+    E403Forbidden,
 
-    E404NotFound,
     //the requested resource cannot be found on the server.
+    E404NotFound,
 
-    E405MethodNotAllowed,
     //the method used is not allowed.
+    E405MethodNotAllowed,
 
-    E406NotAcceptable,
     //the requested resource is capable of generating only content not acceptable according to the Accept headers sent in the request.
+    E406NotAcceptable,
 
-    E407ProxyAuthRequired,
     //the client must first authenticate itself with the proxy.
+    E407ProxyAuthRequired,
 
-    E408RequestTimeout,
     //the request timed out.
+    E408RequestTimeout,
 
-    E409Conflict,
     //the request could not be processed due to the current state of the requested resource
     // (eg: https://en.wikipedia.org/wiki/Edit_conflict)
+    E409Conflict,
 
-    E410Gone,
     //the requested resource is no longer available and will not be available again. This should indicate that the client shouldnt continue requesting it.
+    E410Gone,
 
-    E411LengthRequired,
     //the request did not specify the length of the content, which is required by the resource.
+    E411LengthRequired,
 
-    E412PreconditionFailed,
     //the server does not meet one of the preconditions the client put in the header.
+    E412PreconditionFailed,
 
-    E413PayloadTooLarge,
     //the request is larger than the server is willing or able to process.
+    E413PayloadTooLarge,
 
-    E414URITooLong,
     //the uri provided was too long to process, this is usually the result of a long query string in the uri.
+    E414URITooLong,
 
-    E415UnsupportedMediaType,
     //the request entity has a media type which the server or resource does not support.
+    E415UnsupportedMediaType,
 
-    E416RangeNotSatisfiable,
     //the client asked for a portion of the file which cannot be supplied by the server.
+    E416RangeNotSatisfiable,
 
-    E417ExpectationFailed,
     //the server does not meet the requirements of the `expect` header field.
+    E417ExpectationFailed,
 
-    E418ImATeapot,
     //this code is almost certainly never going to be used, but, it is documented so im having it here. search for it on wikipedia.
+    E418ImATeapot,
 
-    E421MisdirectedRequest,
     //the request was directed at a server which is not able to produce a response (eg: if the server refused a connection).
+    E421MisdirectedRequest,
 
-    E422UnprocessableEntity,
     //the request was formatted properly, but could not be followed due to semantic errors.
+    E422UnprocessableEntity,
 
-    E423Locked,
     //the resource being accessed is locked.
+    E423Locked,
 
-    E424FailedDependency,
     //the request failed because it depended on a different request which also failed.
+    E424FailedDependency,
 
-    E425TooEarly,
     //the server is unwilling to risk processing a request that might be replayed.
+    E425TooEarly,
 
-    E426UpgradeRequired,
     //the client should switch to a different protocol such as TLS/1.0, this is in the upgrade header field.
+    E426UpgradeRequired,
 
-    E428PreconditionRequired,
     //the server requires the request to be conditional.
+    E428PreconditionRequired,
 
-    E429TooManyRequests,
     //the client has sent too many requests in a given amount of time. used with rate-limiting schemes.
+    E429TooManyRequests,
 
-    E431RequestHeaderFieldsTooLarge,
     //the server is unwilling to process the request because either an individual header field, or all of them collectively, are too large.
+    E431RequestHeaderFieldsTooLarge,
 
-    E451UnavailableForLegalReasons,
     //the server operator has receved a legal demand to deny access to a resource or a set of resource including the request resource. A referece to the novel "Fahrenheit 451".
+    E451UnavailableForLegalReasons,
 
-    E500InternalServerError,
     //the server encountered an error and failed to fulfill the request.
+    E500InternalServerError,
 
-    E501NotImplemented,
     //the server does not recognize the method, or lacks the ability to fulfill the request. (ususally implies that it will be available in the future.)
+    E501NotImplemented,
 
-    CrossOriginResourceMethodDisallowed,
     //the server has indicated that the method is not allowed by the origin.
+    CrossOriginResourceMethodDisallowed,
 
-    CrossOriginResourceOriginDisallowed,
     //the server has indicated that the origin is not allowed to access it.
+    CrossOriginResourceOriginDisallowed,
 }
 
 impl fmt::Display for Error {
