@@ -96,9 +96,9 @@ pub struct Response {
 #[derive(Debug, Clone)]
 pub struct Header {
     /// The name of the header (Key)
-    pub name: Option<String>,
+    pub name: String,
     /// The content of the header (Value)
-    pub value: Option<String>,
+    pub value: String,
 }
 
 /// The structure used for storing Cookies and their configuration
@@ -496,6 +496,7 @@ pub struct Connection<'a> {
     pub is_secure: bool,
     pub domain: String,
     pub port: usize,
+    pub in_use: bool,
     pub stream: TcpStream,
     pub tls: Option<rustls::Stream<'a, rustls::ClientSession, &'a mut TcpStream>>,
 }
@@ -509,7 +510,7 @@ pub struct Client<'a> {
 
 
 impl<'a> Client<'a> {
-    pub fn new() -> Client {
+    pub fn new() -> Client<'a> {
         Client {
             global_headers: HashMap::new(),
             pool: HashMap::new(),
@@ -527,7 +528,32 @@ impl<'a> Client<'a> {
         }
     }
 
-    pub fn get<S: Into<String>>(&mut self, uri: S) -> Request {
-        Request::get(uri.into());
+
+
+    pub fn get<S: Into<String>>(&mut self, uri: S) -> &mut Request {
+        self.queue.push(Request::get(uri.into()));
+        return self.queue.last_mut().unwrap();
     }
+
+    pub fn post<S: Into<String>>(&mut self, uri: S) -> &mut Request {
+        self.queue.push(Request::post(uri.into()));
+        return self.queue.last_mut().unwrap();
+    }
+
+    pub fn delete<S: Into<String>>(&mut self, uri: S) -> &mut Request {
+        self.queue.push(Request::delete(uri.into()));
+        return self.queue.last_mut().unwrap();
+    }
+
+    pub fn head<S: Into<String>>(&mut self, uri: S) -> &mut Request {
+        self.queue.push(Request::head(uri.into()));
+        return self.queue.last_mut().unwrap();
+    }
+
+    pub fn options<S: Into<String>>(&mut self, uri: S) -> &mut Request {
+        self.queue.push(Request::options(uri.into()));
+        return self.queue.last_mut().unwrap();
+    }
+
+    //pub fn connect
 }

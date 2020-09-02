@@ -26,7 +26,7 @@ pub fn new_response(body_text: String, mut head: Vec<String>) -> Response {
             cookies.insert(cookie.name.clone().unwrap(), cookie);
         } else {
             let header = parse_header(line);
-            headers.insert(header.name.unwrap(), header.value.unwrap());
+            headers.insert(header.name, header.value);
         }
     }
 

@@ -88,8 +88,8 @@ pub fn parse_header(line: String) -> Header {
     let mut value = keypair.join("=");
     value = value.split("\r\n").collect::<Vec<&str>>().join("");
     return Header {
-        name: Some(key),
-        value: Some(value),
+        name: key,
+        value,
     };
 }
 
