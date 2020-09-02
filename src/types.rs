@@ -3,6 +3,9 @@ use std::error::Error as StdError;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
+// This error enum implements codes listed on this page, courtesy of Wikipedia
+// https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+
 #[derive(Debug)]
 pub enum Error {
     //Any error which is not represented here.
