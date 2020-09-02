@@ -1,16 +1,6 @@
 [![Curio - A Blazing Fast HTTP Client](https://raw.githubusercontent.com/fatalcenturion/Curio/media/static/images/Curio_clear.png)](https://crates.io/crates/curio)
 
-[![Rust](https://github.com/fatalcenturion/Curio/workflows/CI/badge.svg?branch=alpha)](https://crates.io/crates/curio) [![Discord](https://img.shields.io/discord/275377268728135680)](https://discord.gg/EYKxkce) [![codecov](https://codecov.io/gh/fatalcenturion/Curio/branch/master/graph/badge.svg)](https://codecov.io/gh/fatalcenturion/Curio) [![Crates.io (latest)](https://img.shields.io/crates/dv/curio)](https://crates.io/crates/curio) [![Crates.io (recent)](https://img.shields.io/crates/dr/curio)](https://crates.io/crates/curio) [![GitHub issues](https://img.shields.io/github/issues-raw/fatalcenturion/curio)](https://crates.io/crates/curio) [![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/fatalcenturion/curio)](https://crates.io/crates/curio)
-
-## WARNING
-
-This branch is for staging changes to the main branch, it is a development branch and should never even be considered for production. if you are using this branch expect at the very least:
-lots of bugs
-many errors
-compilation warnings
-and many other problems.
-
-if you are after the best version of Curio to date, use the master branch, save yourself the headache
+[![Rust](https://github.com/fatalcenturion/Curio/workflows/CI/badge.svg?branch=master)](https://crates.io/crates/curio) [![Discord](https://img.shields.io/discord/275377268728135680)](https://discord.gg/EYKxkce) [![codecov](https://codecov.io/gh/fatalcenturion/Curio/branch/master/graph/badge.svg)](https://codecov.io/gh/fatalcenturion/Curio) [![Crates.io (latest)](https://img.shields.io/crates/dv/curio)](https://crates.io/crates/curio) [![Crates.io (recent)](https://img.shields.io/crates/dr/curio)](https://crates.io/crates/curio) [![GitHub issues](https://img.shields.io/github/issues-raw/fatalcenturion/curio)](https://crates.io/crates/curio) [![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/fatalcenturion/curio)](https://crates.io/crates/curio)
 
 # About
 
