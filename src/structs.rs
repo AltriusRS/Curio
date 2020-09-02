@@ -3,9 +3,6 @@ use std::collections::HashMap;
 use crate::utils::parsers;
 use std::net::TcpStream;
 
-pub(crate) mod errors;
-
-
 /// Defines the method to be used in the request
 #[derive(Debug, Clone)]
 pub enum RequestType {
@@ -324,11 +321,11 @@ impl Request {
 
     /// The `send` method is used to deserialize and send the resulting request to the destination, it uses a series of checks to confirm that it is doing what you want it to do
     /// see any of the above examples for information on how to use this method.
-    pub fn send(&self) -> Result<Response, Box<dyn std::error::Error>> {
+    pub fn send(&self, conn: &mut Connection) -> Result<Response, Box<dyn std::error::Error>> {
         return match self.protocol {
             HTTPtype::HTTPS => {
                 match self.request_type {
-                    RequestType::GET => crate::tls::get(&self.domain, &self.path, false),
+                    RequestType::GET => crate::client::get(conn, self, false),
                     RequestType::HEAD => crate::tls::head(&self.domain, &self.path, false),
                     RequestType::OPTIONS => crate::tls::options(&self.domain, &self.path, false),
                     RequestType::DELETE => crate::tls::delete(&self.domain, &self.path, false),
@@ -504,7 +501,6 @@ pub struct Connection<'a> {
 pub struct Client<'a> {
     pub global_headers: HashMap<String, String>,
     pool: HashMap<u8, Connection<'a>>,
-    queue: Vec<Request>,
     pub config: ClientConfig,
 }
 
@@ -514,7 +510,6 @@ impl<'a> Client<'a> {
         Client {
             global_headers: HashMap::new(),
             pool: HashMap::new(),
-            queue: vec!(),
             config: ClientConfig {
                 no_parse: false,
                 force_https: false,
@@ -523,36 +518,47 @@ impl<'a> Client<'a> {
                 max_queue_length: 10,
                 perform_preflight: true,
                 connection_limit: 5,
-                cycle_connections: false
-            }
+                cycle_connections: false,
+            },
         }
     }
 
-
-
-    pub fn get<S: Into<String>>(&mut self, uri: S) -> &mut Request {
-        self.queue.push(Request::get(uri.into()));
-        return self.queue.last_mut().unwrap();
+    fn send(mut self, request: Request) {
+        if self.pool.len() == 0 {
+            println!("{:#?}", request);
+            // let connection = Connection {
+            //     is_secure: false,
+            //     domain: request.domain,
+            //     port: 80,
+            //     in_use: false,
+            //     stream: TcpStream(format!("{}:{}", self.domain, self.port)),
+            //     tls: None,
+            // };
+            // self.pool.insert(1, connection);
+            // request.send(self.pool.get_mut(&1).unwrap());
+        }
     }
 
-    pub fn post<S: Into<String>>(&mut self, uri: S) -> &mut Request {
-        self.queue.push(Request::post(uri.into()));
-        return self.queue.last_mut().unwrap();
+    pub fn get<S: Into<String>>(&mut self, uri: S) -> Request {
+        Request::get(uri.into());
     }
 
-    pub fn delete<S: Into<String>>(&mut self, uri: S) -> &mut Request {
-        self.queue.push(Request::delete(uri.into()));
-        return self.queue.last_mut().unwrap();
+    pub fn post<S: Into<String>>(&mut self, uri: S, body: &PostData) -> Request {
+        let mut r = Request::post(uri.into());
+        r.set_body(body);
+        return r;
     }
 
-    pub fn head<S: Into<String>>(&mut self, uri: S) -> &mut Request {
-        self.queue.push(Request::head(uri.into()));
-        return self.queue.last_mut().unwrap();
+    pub fn delete<S: Into<String>>(&mut self, uri: S) -> Request {
+        Request::delete(uri.into());
     }
 
-    pub fn options<S: Into<String>>(&mut self, uri: S) -> &mut Request {
-        self.queue.push(Request::options(uri.into()));
-        return self.queue.last_mut().unwrap();
+    pub fn head<S: Into<String>>(&mut self, uri: S) -> Request {
+        Request::head(uri.into());
+    }
+
+    pub fn options<S: Into<String>>(&mut self, uri: S) -> Request {
+        Request::options(uri.into());
     }
 
     //pub fn connect
