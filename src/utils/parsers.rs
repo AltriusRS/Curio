@@ -1,68 +1,85 @@
 use std::collections::HashMap;
-use crate::structs::{Cookie, Header, HTTPtype};
+
+use crate::structs::{Cookie, Header, HTTPProtocol};
+
+const KEY: &str = "N4M3";
+const VALUE: &str = "V41U3";
+const HTTP_ONLY: &str = "HttpOnly";
+const SECURE: &str = "secure";
 
 pub fn parse_cookie(line: String) -> Cookie {
     let formatted = line.split("Set-Cookie:").collect::<Vec<&str>>();
     let args = formatted.last().unwrap().split(';').collect::<Vec<&str>>();
     let mut parsed_args = HashMap::<String, String>::new();
-    for arg in &args {
-        let pos: &usize = &args.iter().position(|&e| &e == arg).unwrap();
+    for index in 0..args.len() {
+        let arg = args.get(index).unwrap();
+
         let mut keypair = arg.split("=").collect::<Vec<&str>>();
         keypair.reverse();
         let mut key_name = keypair.pop().unwrap().split(" ").collect::<Vec<&str>>();
-        if key_name.len() as isize > 1 {
-            key_name.reverse();
-            key_name.pop();
-            key_name.reverse();
-        }
-        let mut key: String = key_name.join(" ");
-        if key_name.len() == 1 as usize {
-            key = key_name.last().unwrap().to_string();
-        }
+
+        let key = match key_name.len() {
+            1 => key_name.last().unwrap().to_string(),
+            0 => String::new(),
+            _ => {
+                key_name.reverse();
+                key_name.pop();
+                key_name.reverse();
+
+                key_name.join(" ")
+            }
+        };
+
         let value = keypair.join("=");
 
-        if pos == &usize::from(0 as u8) {
-            parsed_args.insert(String::from("N4M3"), String::from(key));
-            parsed_args.insert(String::from("V41U3"), String::from(value));
+        if index == 0 {
+            parsed_args.insert(KEY.to_owned(), key);
+            parsed_args.insert(VALUE.to_owned(), value);
         } else {
-            if key == "HttpOnly" || key == "secure" {
-                parsed_args.insert(key, String::from("True"));
-            } else {
-                parsed_args.insert(key.to_ascii_lowercase(), String::from(value));
-            }
+            match key.as_str() {
+                HTTP_ONLY | SECURE => parsed_args.insert(key, "a".to_owned()),
+                _ => parsed_args.insert(key.to_ascii_lowercase(), value),
+            };
         }
     }
 
-    let name = Some(parsed_args.get("N4M3").unwrap().clone());
-    let value = Some(parsed_args.get("V41U3").unwrap().clone());
-    let max_age: Option<isize> = match parsed_args.get("Max Age") {
-        Some(x) => Some(x.as_str().parse::<isize>().unwrap()),
-        None => None,
-    };
-    let expires = match parsed_args.get("expires") {
-        Some(x) => Some(x.clone()),
-        None => None,
-    };
-    let path = match parsed_args.get("path") {
-        Some(x) => Some(x.clone()),
-        None => None,
-    };
-    let domain = match parsed_args.get("domain") {
-        Some(x) => Some(x.clone()),
-        None => None,
-    };
-    let same_site = match parsed_args.get("SameSite") {
-        Some(x) => Some(x.clone()),
-        None => None,
-    };
-    let http_only = match parsed_args.get("HttpOnly") {
-        Some(_) => true,
-        None => false,
-    };
-    let secure = match parsed_args.get("secure") {
-        Some(_) => true,
-        None => false,
-    };
+    let name = parsed_args.get(KEY)
+        .unwrap()
+        .clone();
+
+    let value = parsed_args.get(VALUE)
+        .unwrap()
+        .clone();
+
+    let max_age = parsed_args.get("Max Age")
+        .expect("Failed to parse 'Max Age'")
+        .as_str()
+        .parse::<usize>()
+        .expect("Failed to parse 'Max Age' as usize");
+
+    let expires = parsed_args.get("expires")
+        .expect("Failed to parse 'expires'")
+        .clone();
+
+    let path = parsed_args.get("path")
+        .expect("Failed to parse 'path'")
+        .clone();
+
+    let domain = parsed_args.get("domain")
+        .expect("Failed to parse 'domain'")
+        .clone();
+
+    let same_site = parsed_args.get("same_site")
+        .expect("Failed to parse 'same_site'")
+        .clone();
+
+    let http_only = parsed_args.get(HTTP_ONLY)
+        .expect(format!("Failed to parse '{}'", HTTP_ONLY).as_str())
+        .len() > 0;
+
+    let secure = parsed_args.get(SECURE)
+        .expect(format!("Failed to parse '{}'", SECURE).as_str())
+        .len() > 0;
 
     return Cookie {
         name,
@@ -93,10 +110,10 @@ pub fn parse_header(line: String) -> Header {
     };
 }
 
-pub fn parse_url(url: &String) -> (HTTPtype, String, usize, String) {
-    let mut http = HTTPtype::HTTP;
+pub fn parse_url(url: &String) -> (HTTPProtocol, String, usize, String) {
+    let mut http = HTTPProtocol::HTTP;
     if url.contains("https") {
-        http = HTTPtype::HTTPS;
+        http = HTTPProtocol::HTTPS;
     }
     let protless_url_vec = url.split(r"/^(?:https?:\/\/)/igm").collect::<Vec<&str>>();
     let protless_url = protless_url_vec.last().unwrap();
@@ -107,11 +124,11 @@ pub fn parse_url(url: &String) -> (HTTPtype, String, usize, String) {
     let domain_str = url_parts.pop().unwrap();
 
     let mut port: usize = match http {
-        HTTPtype::HTTP => 80,
-        HTTPtype::HTTPS => 443,
+        HTTPProtocol::HTTP => 80,
+        HTTPProtocol::HTTPS => 443,
     };
 
-    let mut domain: String = String::new();
+    let mut domain = String::new();
 
     if domain_str.contains(":") {
         let mut domain_components = domain_str.split(":").collect::<Vec<&str>>();
