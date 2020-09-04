@@ -50,8 +50,8 @@ pub struct Request {
 
 #[derive(Debug, Clone)]
 pub enum DataType {
-    MultiPart = 0,
-    PlainText = 1,
+    MultiPart,
+    PlainText,
 }
 
 /// store request body content through a variety of methods, resulting in similar, or identical outputs via HTTP POST
