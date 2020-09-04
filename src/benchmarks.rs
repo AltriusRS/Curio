@@ -12,7 +12,7 @@ fn bench_response_parsing() {
             "Date: Fri, 21 Aug 2020 17:42:29 GMT\r\n".to_string(),
             "Content-Type: application/json; charset=utf-8\r\n".to_string(),
             "Connection: keep-alive\r\n".to_string(),
-            "Set-Cookie: __cfduid=d1cd636ec4303be8a4ac9d8d01f93e1e71598031749; expires=Sun, 20-Sep-20 17:42:29 GMT; path=/; domain=.typicode.com; HttpOnly; SameSite=Lax\r\n".to_string(),
+            "Set-Cookie: __cfduid=d1cd636ec4303be8a4ac9d8d01f93e1e71598031749; Expires=Sun, 20-Sep-20 17:42:29 GMT; Path=/; Domain=.typicode.com; HttpOnly; SameSite=Lax\r\n".to_string(),
             "X-Powered-By: Express\r\n".to_string(),
             "X-Ratelimit-Limit: 1000\r\n".to_string(),
             "X-Ratelimit-Remaining: 999\r\n".to_string(),
@@ -37,7 +37,7 @@ fn bench_response_parsing() {
 
 #[test]
 fn bench_cookie_parsing() {
-    let cookie = "Set-Cookie: has_recent_activity=1; path=/; expires=Fri, 21 Aug 2020 21:11:53 GMT; secure; HttpOnly; SameSite=Lax";
+    let cookie = "Set-Cookie: has_recent_activity=1; Path=/; Expires=Fri, 21 Aug 2020 21:11:53 GMT; Secure; HttpOnly; SameSite=Lax";
     bench("parse cookie", LIMIT, || {
         crate::utils::parsers::parse_cookie(cookie.to_string());
     })

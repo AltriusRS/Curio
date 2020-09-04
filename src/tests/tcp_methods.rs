@@ -38,7 +38,7 @@ fn test_tcp_head() {
 #[test]
 fn test_tcp_put() {
     let mut request = crate::structs::Request::delete("http://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
-    request.request_type = crate::structs::RequestType::PUT;
+    request.request_type = crate::structs::RequestType::Put;
     let response = request.send().unwrap();
     println!("{:#?}", response);
     assert_eq!(response.status.unwrap(), 200);
@@ -47,7 +47,7 @@ fn test_tcp_put() {
 #[test]
 fn test_tcp_patch() {
     let mut request = crate::structs::Request::delete("http://raw.githubusercontent.com/fatalcenturion/Curio/master/README.md");
-    request.request_type = crate::structs::RequestType::PATCH;
+    request.request_type = crate::structs::RequestType::Patch;
     let response = request.send().unwrap();
     println!("{:#?}", response);
     assert_eq!(response.status.unwrap(), 200);

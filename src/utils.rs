@@ -23,7 +23,7 @@ pub fn new_response(body_text: String, mut head: Vec<String>) -> Response {
     for line in head {
         if line.starts_with("Set-Cookie:") {
             let cookie = parse_cookie(line);
-            cookies.insert(cookie.name.clone().unwrap(), cookie);
+            cookies.insert(cookie.name.clone(), cookie);
         } else {
             let header = parse_header(line);
             headers.insert(header.name, header.value);

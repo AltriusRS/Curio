@@ -1,31 +1,32 @@
-use crate::utils;
 use std::collections::HashMap;
-use crate::utils::parsers;
 use std::net::TcpStream;
+
+use crate::utils;
+use crate::utils::parsers;
 
 /// Defines the method to be used in the request
 #[derive(Debug, Clone)]
 pub enum RequestType {
-    GET = 0,
-    POST = 1,
-    PUT = 2,
-    HEAD = 3,
-    DELETE = 4,
-    PATCH = 5,
-    OPTIONS = 6,
+    Get,
+    Post,
+    Put,
+    Head,
+    Delete,
+    Patch,
+    Options,
 }
 
 /// Defines the type of HTTP to be used in the request (TCP/TLS)
 #[derive(Debug, Clone)]
-pub enum HTTPtype {
-    HTTP = 0,
-    HTTPS = 1,
+pub enum HTTPProtocol {
+    HTTP,
+    HTTPS,
 }
 
 /// Build a request, without any of the knowledge of how HTTP works, this structure takes care of it all, and still follows specifications
 #[derive(Debug, Clone)]
 pub struct Request {
-    /// The type of request to be performed (GET, HEAD, DELETE, POST, etc...)
+    /// The type of request to be performed (Get, Head, Delete, Post, etc...)
     pub request_type: RequestType,
     /// The raw URL input when you initialise the request, this is stored for you, we dont actually need to store this as we dont use it :)
     pub url_string: String,
@@ -38,7 +39,7 @@ pub struct Request {
     /// The protocol to use:
     /// This can be HTTP, or HTTPS
     /// If a server requests we use HTTPS, we will automatically switch over anyway, no fiddling needed
-    pub protocol: HTTPtype,
+    pub protocol: HTTPProtocol,
     /// Not all requests have a body, this is an optional field containing a tuple value of both the encoding, and the body content
     pub body: Option<(String, String)>,
     /// This stores the values of each header you set within the request. This is the first step to authenticating a request
@@ -49,8 +50,8 @@ pub struct Request {
 
 #[derive(Debug, Clone)]
 pub enum DataType {
-    MULTIPART = 0,
-    PLAINTEXT = 1,
+    MultiPart,
+    PlainText,
 }
 
 /// store request body content through a variety of methods, resulting in similar, or identical outputs via HTTP POST
@@ -104,23 +105,23 @@ pub struct Header {
 #[derive(Debug, Clone)]
 pub struct Cookie {
     /// The name of the cookie
-    pub name: Option<String>,
+    pub name: String,
     /// The cookie's value
-    pub value: Option<String>,
+    pub value: String,
     /// When the cookie should expire
     pub expires: Option<String>,
+    /// The maximum age of the cookie, in seconds
+    pub max_age: Option<usize>,
     /// The path this cookie is applied to
     pub path: Option<String>,
     /// The domain the cookie is applied to
     pub domain: Option<String>,
-    /// Whether this cookie is restricted from HTTPS requests
-    pub http_only: bool,
     /// Whether the cookie can be transferred between websites
     pub same_site: Option<String>,
+    /// Whether this cookie is restricted from HTTPS requests
+    pub http_only: bool,
     /// If the cookie requires HTTPS to be set
     pub secure: bool,
-    /// The maximum age of the cookie, in seconds
-    pub max_age: Option<isize>,
 }
 
 #[derive(Debug, Clone)]
@@ -160,7 +161,7 @@ impl Request {
         let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
-            request_type: RequestType::GET,
+            request_type: RequestType::Get,
             url_string,
             domain,
             port,
@@ -190,7 +191,7 @@ impl Request {
         let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
-            request_type: RequestType::HEAD,
+            request_type: RequestType::Head,
             url_string,
             domain,
             port,
@@ -219,7 +220,7 @@ impl Request {
         let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
-            request_type: RequestType::DELETE,
+            request_type: RequestType::Delete,
             url_string,
             domain,
             port,
@@ -248,7 +249,7 @@ impl Request {
         let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
-            request_type: RequestType::OPTIONS,
+            request_type: RequestType::Options,
             url_string,
             domain,
             port,
@@ -284,7 +285,7 @@ impl Request {
         let (protocol, domain, port, path) = parsers::parse_url(&url_string);
 
         Request {
-            request_type: RequestType::POST,
+            request_type: RequestType::Post,
             url_string,
             domain,
             port,
@@ -330,26 +331,26 @@ impl Request {
     /// see any of the above examples for information on how to use this method.
     pub fn send(&self/*,conn: &mut Connection //This is for the alpha branch*/) -> Result<Response, Box<dyn std::error::Error>> {
         return match self.protocol {
-            HTTPtype::HTTPS => {
+            HTTPProtocol::HTTPS => {
                 match self.request_type {
-                    RequestType::GET => crate::tls::get(&self.domain, &self.path, false),
-                    RequestType::HEAD => crate::tls::head(&self.domain, &self.path, false),
-                    RequestType::OPTIONS => crate::tls::options(&self.domain, &self.path, false),
-                    RequestType::DELETE => crate::tls::delete(&self.domain, &self.path, false),
-                    RequestType::POST => crate::tls::post(&self.domain, &self.path, self.clone(), false),
+                    RequestType::Get => crate::tls::get(&self.domain, &self.path, false),
+                    RequestType::Head => crate::tls::head(&self.domain, &self.path, false),
+                    RequestType::Options => crate::tls::options(&self.domain, &self.path, false),
+                    RequestType::Delete => crate::tls::delete(&self.domain, &self.path, false),
+                    RequestType::Post => crate::tls::post(&self.domain, &self.path, self.clone(), false),
                     _ => {
                         println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
                         crate::tcp::get(&self.domain, &self.path)
                     }
                 }
             }
-            HTTPtype::HTTP => {
+            HTTPProtocol::HTTP => {
                 match self.request_type {
-                    RequestType::GET => crate::tcp::get(&self.domain, &self.path),
-                    RequestType::HEAD => crate::tcp::head(&self.domain, &self.path),
-                    RequestType::OPTIONS => crate::tcp::options(&self.domain, &self.path),
-                    RequestType::DELETE => crate::tcp::delete(&self.domain, &self.path),
-                    RequestType::POST => crate::tcp::post(&self.domain, &self.path, self.clone()),
+                    RequestType::Get => crate::tcp::get(&self.domain, &self.path),
+                    RequestType::Head => crate::tcp::head(&self.domain, &self.path),
+                    RequestType::Options => crate::tcp::options(&self.domain, &self.path),
+                    RequestType::Delete => crate::tcp::delete(&self.domain, &self.path),
+                    RequestType::Post => crate::tcp::post(&self.domain, &self.path, self.clone()),
                     _ => {
                         println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
                         crate::tcp::get(&self.domain, &self.path)
@@ -414,7 +415,7 @@ impl PostData {
     /// ```
     pub fn from_str<S: Into<String>>(str: S) -> PostData {
         PostData {
-            method: DataType::PLAINTEXT,
+            method: DataType::PlainText,
             raw: str.into(),
             kv_store: HashMap::<String, String>::new(),
         }
@@ -442,7 +443,7 @@ impl PostData {
         }
 
         return PostData {
-            method: DataType::MULTIPART,
+            method: DataType::MultiPart,
             raw: "".to_string(),
             kv_store,
         };
@@ -469,7 +470,7 @@ impl PostData {
         }
 
         return PostData {
-            method: DataType::MULTIPART,
+            method: DataType::MultiPart,
             raw: "".to_string(),
             kv_store,
         };
