@@ -1,7 +1,8 @@
-use crate::utils;
 use std::collections::HashMap;
-use crate::utils::parsers;
 use std::net::TcpStream;
+
+use crate::utils;
+use crate::utils::parsers;
 
 /// Defines the method to be used in the request
 #[derive(Debug, Clone)]
@@ -108,19 +109,19 @@ pub struct Cookie {
     /// The cookie's value
     pub value: String,
     /// When the cookie should expire
-    pub expires: String,
+    pub expires: Option<String>,
+    /// The maximum age of the cookie, in seconds
+    pub max_age: Option<usize>,
     /// The path this cookie is applied to
-    pub path: String,
+    pub path: Option<String>,
     /// The domain the cookie is applied to
-    pub domain: String,
+    pub domain: Option<String>,
+    /// Whether the cookie can be transferred between websites
+    pub same_site: Option<String>,
     /// Whether this cookie is restricted from HTTPS requests
     pub http_only: bool,
-    /// Whether the cookie can be transferred between websites
-    pub same_site: String,
     /// If the cookie requires HTTPS to be set
     pub secure: bool,
-    /// The maximum age of the cookie, in seconds
-    pub max_age: usize,
 }
 
 #[derive(Debug, Clone)]

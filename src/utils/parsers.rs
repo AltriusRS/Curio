@@ -5,12 +5,23 @@ use crate::structs::{Cookie, Header, HTTPProtocol};
 const KEY: &str = "N4M3";
 const VALUE: &str = "V41U3";
 const HTTP_ONLY: &str = "HttpOnly";
-const SECURE: &str = "secure";
+const SECURE: &str = "Secure";
 
 pub fn parse_cookie(line: String) -> Cookie {
+    fn unwrap_parsed_arg<T, F: FnOnce(&String) -> T>(parsed_arg: Option<&String>, unwrap: F) -> Option<T> {
+        match parsed_arg {
+            Some(x) => Some(unwrap(x)),
+            None => None,
+        }
+    }
+
     let formatted = line.split("Set-Cookie:").collect::<Vec<&str>>();
     let args = formatted.last().unwrap().split(';').collect::<Vec<&str>>();
     let mut parsed_args = HashMap::<String, String>::new();
+
+    let mut http_only = false;
+    let mut secure = false;
+
     for index in 0..args.len() {
         let arg = args.get(index).unwrap();
 
@@ -37,8 +48,9 @@ pub fn parse_cookie(line: String) -> Cookie {
             parsed_args.insert(VALUE.to_owned(), value);
         } else {
             match key.as_str() {
-                HTTP_ONLY | SECURE => parsed_args.insert(key, "a".to_owned()),
-                _ => parsed_args.insert(key.to_ascii_lowercase(), value),
+                HTTP_ONLY => { http_only = true; }
+                SECURE => { secure = true; }
+                _ => { parsed_args.insert(key, value); }
             };
         }
     }
@@ -51,46 +63,30 @@ pub fn parse_cookie(line: String) -> Cookie {
         .unwrap()
         .clone();
 
-    let max_age = parsed_args.get("Max Age")
-        .expect("Failed to parse 'Max Age'")
-        .as_str()
-        .parse::<usize>()
-        .expect("Failed to parse 'Max Age' as usize");
+    let clone = |s: &String| s.clone();
 
-    let expires = parsed_args.get("expires")
-        .expect("Failed to parse 'expires'")
-        .clone();
+    let expires = unwrap_parsed_arg(parsed_args.get("Expires"), clone);
 
-    let path = parsed_args.get("path")
-        .expect("Failed to parse 'path'")
-        .clone();
+    let max_age = unwrap_parsed_arg(parsed_args.get("Max-Age"), |s| {
+        s.parse::<usize>().expect("Failed to parse 'Max-Age' as {integer}")
+    });
 
-    let domain = parsed_args.get("domain")
-        .expect("Failed to parse 'domain'")
-        .clone();
+    let path = unwrap_parsed_arg(parsed_args.get("Path"), clone);
 
-    let same_site = parsed_args.get("same_site")
-        .expect("Failed to parse 'same_site'")
-        .clone();
+    let domain = unwrap_parsed_arg(parsed_args.get("Domain"), clone);
 
-    let http_only = parsed_args.get(HTTP_ONLY)
-        .expect(format!("Failed to parse '{}'", HTTP_ONLY).as_str())
-        .len() > 0;
-
-    let secure = parsed_args.get(SECURE)
-        .expect(format!("Failed to parse '{}'", SECURE).as_str())
-        .len() > 0;
+    let same_site = unwrap_parsed_arg(parsed_args.get("SameSite"), clone);
 
     return Cookie {
         name,
         value,
         expires,
+        max_age,
         path,
-        domain,
         http_only,
+        domain,
         same_site,
         secure,
-        max_age,
     };
 }
 
