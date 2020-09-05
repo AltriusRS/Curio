@@ -570,6 +570,19 @@ impl Client {
     //pub fn connect
 }
 pub(crate) struct Connection<'a> {
-    pub tcp: Option<TcpStream>,
+    pub tcp: Option<&'a mut TcpStream>,
     pub tls: Option<Stream<'a, ClientSession, TcpStream>>
+}
+
+impl <'a> Connection<'a> {
+    pub fn write<A:Into<String>>(&mut self, content: A) {
+        match self.tcp {
+            Some(stream) => {
+                stream.write
+            },
+            None => {
+
+            }
+        }
+    }
 }

@@ -9,46 +9,47 @@ use std::str::FromStr;
 use std::time::Duration;
 
 pub fn get(req: &Request) -> CurioResult<Response> {
-
+    let config = Arc::new(build_tls_config());
+    let dns_ref = DNSNameRef::try_from_ascii_str(&req.domain.as_str()).unwrap();
+    let mut session = build_tls_session(&config, &dns_ref);
+    let mut tcp = build_tcp_stream(&req.domain, &req.port);
     let connection = match req.protocol {
-        HTTPProtocol::HTTP => build_connection(&req.protocol, &req.domain, &req.port, None),
+        HTTPProtocol::HTTP => build_tcp_connection(&mut tcp),
         HTTPProtocol::HTTPS => {
-            let config = Arc::new(build_tls_config());
-            let dns_ref = DNSNameRef::try_from_ascii_str(req.domain.clone().as_str()).unwrap();
-            let session = build_tls_session(&config, &dns_ref);
-            build_connection(&req.protocol, &req.domain, &req.port, Some(session))
+            build_tls_connection(&req.protocol, &mut tcp, &mut session)
         }
     };
 
     let request = format!("GET {} HTTP/1.1\r\nUser-Agent: {}\r\nHost: {}\r\n\\r\n", req.path, req.user_agent, req.domain);
     return match req.protocol {
         HTTPProtocol::HTTPS => {
+            connection.write(request);
             Err(crate::types::err_from_code(301))
-        },
+        }
         HTTPProtocol::HTTP => {
-            println!("TCP: {:#?}\nTLS: is none? {}", connection.tcp, connection.tls.is_none());
-
+            connection.write(request);
             Err(crate::types::err_from_code(0))
         }
-    }
+    };
 }
 
 
-fn build_connection<'a>(protocol: &HTTPProtocol, domain: &String, port: &usize, session: Option<ClientSession>) -> Connection<'a> {
+fn build_tcp_stream(domain: &String, port: &usize) -> TcpStream {
     let address = parse_socket(&domain, &port);
-    match protocol {
-        HTTPProtocol::HTTP => {
-            Connection {
-                tcp: Some(TcpStream::connect_timeout(&address, Duration::from_secs(20)).unwrap()),
-                tls: None
-            }
-        },
-        HTTPProtocol::HTTPS => {
-            Connection {
-                tcp: None,
-                tls: Some(rustls::Stream::new(&mut session.unwrap(), &mut TcpStream::connect_timeout(&address, Duration::from_secs(20)).unwrap()))
-            }
-        }
+    TcpStream::connect_timeout(&address, Duration::from_secs(20)).unwrap()
+}
+
+fn build_tcp_connection(stream: &mut TcpStream) -> Connection {
+    Connection {
+        tcp: Some(stream),
+        tls: None,
+    }
+}
+
+fn build_tls_connection<'a>(protocol: &HTTPProtocol, stream: &'a mut TcpStream, session: &'a mut ClientSession) -> Connection<'a> {
+    Connection {
+        tcp: None,
+        tls: Some(rustls::Stream::new(session, stream)),
     }
 }
 
