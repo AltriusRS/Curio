@@ -1,31 +1,28 @@
 use crate::utils;
 use std::collections::HashMap;
 use crate::utils::parsers;
-use std::net::{TcpStream, SocketAddr};
-use webpki::DNSNameRef;
-use std::sync::Arc;
-use rustls::ClientSession;
-use webpki_roots::TLS_SERVER_ROOTS;
 use std::str::FromStr;
 use std::time::Duration;
+use std::net::TcpStream;
+use rustls::{Stream, ClientSession};
 
 /// Defines the method to be used in the request
 #[derive(Debug, Clone)]
 pub enum RequestType {
-    GET = 0,
-    POST = 1,
-    PUT = 2,
-    HEAD = 3,
-    DELETE = 4,
-    PATCH = 5,
-    OPTIONS = 6,
+    GET,
+    POST,
+    PUT,
+    HEAD,
+    DELETE,
+    PATCH,
+    OPTIONS,
 }
 
 /// Defines the type of HTTP to be used in the request (TCP/TLS)
 #[derive(Debug, Clone)]
-pub enum HTTPtype {
-    HTTP = 0,
-    HTTPS = 1,
+pub enum HTTPProtocol {
+    HTTP,
+    HTTPS,
 }
 
 /// Build a request, without any of the knowledge of how HTTP works, this structure takes care of it all, and still follows specifications
@@ -37,6 +34,8 @@ pub struct Request {
     pub url_string: String,
     /// The domain of the server to connect to
     pub domain: String,
+    /// The user agent with which curio should identify
+    pub user_agent: String,
     /// The port to attempt connection to (default: 80 for HTTP, 443 for HTTPS)
     pub port: usize,
     /// The path to target our requests at
@@ -44,7 +43,7 @@ pub struct Request {
     /// The protocol to use:
     /// This can be HTTP, or HTTPS
     /// If a server requests we use HTTPS, we will automatically switch over anyway, no fiddling needed
-    pub protocol: HTTPtype,
+    pub protocol: HTTPProtocol,
     /// Not all requests have a body, this is an optional field containing a tuple value of both the encoding, and the body content
     pub body: Option<(String, String)>,
     /// This stores the values of each header you set within the request. This is the first step to authenticating a request
@@ -169,6 +168,7 @@ impl Request {
             request_type: RequestType::GET,
             url_string,
             domain,
+            user_agent: "Curio/0.1.0".to_string(),
             port,
             path,
             protocol,
@@ -199,6 +199,7 @@ impl Request {
             request_type: RequestType::HEAD,
             url_string,
             domain,
+            user_agent: "Curio/0.1.0".to_string(),
             port,
             path,
             protocol,
@@ -228,6 +229,7 @@ impl Request {
             request_type: RequestType::DELETE,
             url_string,
             domain,
+            user_agent: "Curio/0.1.0".to_string(),
             port,
             path,
             protocol,
@@ -257,6 +259,7 @@ impl Request {
             request_type: RequestType::OPTIONS,
             url_string,
             domain,
+            user_agent: "Curio/0.1.0".to_string(),
             port,
             path,
             protocol,
@@ -293,6 +296,7 @@ impl Request {
             request_type: RequestType::POST,
             url_string,
             domain,
+            user_agent: "Curio/0.1.0".to_string(),
             port,
             path,
             protocol,
@@ -332,12 +336,12 @@ impl Request {
         self
     }
 
-    pub fn new_send(&self, conn: &mut Connection) -> crate::types::Result<Response> {
+    pub fn new_send(&self) -> crate::types::Result<Response> {
         return match self.request_type {
-            RequestType::GET => crate::client::get(conn, &self),
+            RequestType::GET => crate::client::get(&self),
             _ => {
                 println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
-                crate::client::get(conn, &self)
+                crate::client::get(&self)
             }
         };
     }
@@ -346,7 +350,7 @@ impl Request {
     /// see any of the above examples for information on how to use this method.
     pub fn send(&self/*,conn: &mut Connection //This is for the alpha branch*/) -> Result<Response, Box<dyn std::error::Error>> {
         return match self.protocol {
-            HTTPtype::HTTPS => {
+            HTTPProtocol::HTTPS => {
                 match self.request_type {
                     RequestType::GET => crate::tls::get(&self.domain, &self.path, false),
                     RequestType::HEAD => crate::tls::head(&self.domain, &self.path, false),
@@ -359,7 +363,7 @@ impl Request {
                     }
                 }
             }
-            HTTPtype::HTTP => {
+            HTTPProtocol::HTTP => {
                 match self.request_type {
                     RequestType::GET => crate::tcp::get(&self.domain, &self.path),
                     RequestType::HEAD => crate::tcp::head(&self.domain, &self.path),
@@ -512,67 +516,18 @@ impl PostData {
     }
 }
 
-pub struct Connection<'a> {
-    pub is_secure: bool,
-    pub domain: String,
-    pub port: usize,
-    pub in_use: bool,
-    pub stream: Option<TcpStream>,
-    pub tls: Option<rustls::Stream<'a, rustls::ClientSession, TcpStream>>,
-}
 
-impl<'a> Connection<'a> {
-
-    fn lookup(domain: &String) -> SocketAddr {
-        SocketAddr::from_str(domain.as_str()).unwrap()
-    }
-
-    pub fn connect(domain: &String, port: &usize) -> Connection<'a> {
-        let mut stream = TcpStream::connect_timeout(&Connection::lookup(&format!("{}:{}", domain, port)), Duration::new(20, 0)).unwrap();
-        stream.set_nodelay(true);
-        return Connection {
-            is_secure: false,
-            domain: domain.clone(),
-            port: port.clone(),
-            in_use: false,
-            stream: None,
-            tls: None,
-        };
-    }
-
-    pub fn upgrade<'b>(domain: &String, port: &usize) -> Connection<'a> {
-        let mut con = TcpStream::connect_timeout(&Connection::lookup(&format!("{}:{}", domain, port)), Duration::new(20, 0)).unwrap();
-        con.set_nodelay(true);
-
-        let config = Arc::new(build_tls_config());
-        let domain_ref = DNSNameRef::try_from_ascii_str(domain.as_str()).unwrap();
-        let mut client: ClientSession = ClientSession::new(&config, domain_ref);
-        let mut stream = rustls::Stream::new(&mut client, &mut con.try_clone().unwrap());
-        return Connection {
-            is_secure: true,
-            domain: domain.clone(),
-            port: port.clone(),
-            in_use: false,
-            stream: None,
-            tls: Some(stream),
-        };
-    }
-}
-
-pub struct Client<'a> {
+#[derive(Debug, Clone)]
+pub struct Client {
     pub global_headers: HashMap<String, String>,
-    pool: HashMap<u8, Connection<'a>>,
-    pool_ref: HashMap<u8, bool>,
     pub config: ClientConfig,
 }
 
 
-impl<'a> Client<'a> {
-    pub fn new() -> Client<'a> {
+impl Client {
+    pub fn new() -> Client {
         Client {
             global_headers: HashMap::new(),
-            pool: HashMap::new(),
-            pool_ref: HashMap::new(),
             config: ClientConfig {
                 no_parse: false,
                 force_https: false,
@@ -586,31 +541,8 @@ impl<'a> Client<'a> {
         }
     }
 
-    fn send(mut self, request: Request) -> crate::types::Result<Response> {
-        return if self.pool.len() == 0 {
-            println!("{:#?}", request);
-            let mut connection = match request.protocol {
-                HTTPtype::HTTPS => Connection::upgrade(&request.domain, &request.port),
-                _ => Connection::connect(&request.domain, &request.port)
-            };
-            self.pool.insert(1, connection);
-            self.pool_ref.insert(1, true);
-            let req = request.new_send(&mut self.pool.get_mut(&1).unwrap());
-            self.pool_ref.insert(1, false);
-            req
-        } else {
-            let mut first_free = 1;
-            for (id, busy) in self.pool_ref.clone() {
-                if id < first_free && !busy {
-                    first_free = id;
-                    break;
-                }
-            }
-            self.pool_ref.insert(first_free.clone(), true);
-            let req = request.new_send(self.pool.get_mut(&first_free).unwrap());
-            self.pool_ref.insert(first_free, false);
-            req
-        };
+    pub fn send(mut self, request: Request) -> crate::types::Result<Response> {
+        return request.new_send();
     }
 
     pub fn get<S: Into<String>>(&mut self, uri: S) -> Request {
@@ -637,9 +569,7 @@ impl<'a> Client<'a> {
 
     //pub fn connect
 }
-
-fn build_tls_config() -> rustls::ClientConfig {
-    let mut cfg = rustls::ClientConfig::new();
-    cfg.root_store.add_server_trust_anchors(&TLS_SERVER_ROOTS);
-    cfg
+pub(crate) struct Connection<'a> {
+    pub tcp: Option<TcpStream>,
+    pub tls: Option<Stream<'a, ClientSession, TcpStream>>
 }

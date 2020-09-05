@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::structs::{Cookie, Header, HTTPtype};
+use crate::structs::{Cookie, Header, HTTPProtocol};
 
 pub fn parse_cookie(line: String) -> Cookie {
     let formatted = line.split("Set-Cookie:").collect::<Vec<&str>>();
@@ -93,10 +93,10 @@ pub fn parse_header(line: String) -> Header {
     };
 }
 
-pub fn parse_url(url: &String) -> (HTTPtype, String, usize, String) {
-    let mut http = HTTPtype::HTTP;
+pub fn parse_url(url: &String) -> (HTTPProtocol, String, usize, String) {
+    let mut http = HTTPProtocol::HTTP;
     if url.contains("https") {
-        http = HTTPtype::HTTPS;
+        http = HTTPProtocol::HTTPS;
     }
     let protless_url_vec = url.split(r"/^(?:https?:\/\/)/igm").collect::<Vec<&str>>();
     let protless_url = protless_url_vec.last().unwrap();
@@ -107,8 +107,8 @@ pub fn parse_url(url: &String) -> (HTTPtype, String, usize, String) {
     let domain_str = url_parts.pop().unwrap();
 
     let mut port: usize = match http {
-        HTTPtype::HTTP => 80,
-        HTTPtype::HTTPS => 443,
+        HTTPProtocol::HTTP => 80,
+        HTTPProtocol::HTTPS => 443,
     };
 
     let mut domain: String = String::new();
