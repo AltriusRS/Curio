@@ -3,7 +3,8 @@ use std::collections::HashMap;
 use crate::utils::parsers;
 use std::net::TcpStream;
 use rustls::{Stream, ClientSession};
-use std::io::{Write, BufReader, BufRead};
+use std::io::{Write, BufReader, BufRead, Read};
+use std::str::FromStr;
 
 /// Defines the method to be used in the request
 #[derive(Debug, Clone)]
@@ -568,20 +569,21 @@ impl Client {
 
     //pub fn connect
 }
+
 pub(crate) struct Connection<'a> {
     pub tcp: Option<&'a mut TcpStream>,
-    pub tls: Option<Stream<'a, ClientSession, TcpStream>>
+    pub tls: Option<Stream<'a, ClientSession, TcpStream>>,
 }
 
-impl <'a> Connection<'a> {
-    pub fn write<A:Into<String>>(mut self, content: A) -> Connection<'a> {
+impl<'a> Connection<'a> {
+    pub fn write<A: Into<String>>(mut self, content: A) -> Connection<'a> {
         let ct = content.into();
         match self.tcp {
             Some(mut stream) => {
                 stream.write_all(ct.as_bytes());
                 stream.flush();
                 self.tcp = Some(stream);
-            },
+            }
             None => {
                 let mut stream = self.tls.unwrap();
                 stream.write_all(ct.as_bytes());
@@ -592,7 +594,7 @@ impl <'a> Connection<'a> {
         self
     }
 
-    pub fn read_head(mut self) -> Response {
+    pub fn read_head(mut self) -> (Response, Connection<'a>) {
         match self.tcp {
             Some(mut stream) => {
                 let mut reader = BufReader::new(&mut stream);
@@ -612,8 +614,9 @@ impl <'a> Connection<'a> {
                 lines.pop();
 
                 let head = lines;
-                Response::new(String::new(), head)
-            },
+                self.tcp = Some(stream);
+                (Response::new(String::new(), head), self)
+            }
             None => {
                 let mut stream = self.tls.unwrap();
                 let mut reader = BufReader::new(&mut stream);
@@ -634,32 +637,64 @@ impl <'a> Connection<'a> {
 
                 let head = lines;
                 self.tls = Some(stream);
-                Response::new(String::new(), head)
+                (Response::new(String::new(), head), self)
             }
         }
     }
 
-    pub fn read_body_string(mut self, head: Response) -> Response {
+    pub fn read_body_string(mut self, head: &mut Response) -> Response {
+        let mut response = String::new();
         let mut lines: Vec<String> = Vec::new();
-        if !head.headers.contains_key("Content-Length") {
-            if head.headers.get("Transfer-Encoding").unwrap_or(&String::new()) == &String::from("chunked") {
-                while lines.last().unwrap_or(&String::from("")) != &String::from("\r\n") {
-                    let mut buf_str = String::new();
-                    reader.read_line(&mut buf_str)?;
-                    lines.push(buf_str.clone());
-                }
-                let encoded = lines.join("");
-                let mut decoder = chunked_transfer::Decoder::new(encoded.as_bytes());
-                decoder.read_to_string(&mut response)?;
+        return match self.tcp {
+            Some(stream) => {
+                let mut reader = BufReader::new(stream);
+                if !head.headers.contains_key("Content-Length") {
+                    if head.headers.get("Transfer-Encoding").unwrap_or(&String::new()) == &String::from("chunked") {
+                        while lines.last().unwrap_or(&String::from("")) != &String::from("\r\n") {
+                            let mut buf_str = String::new();
+                            reader.read_line(&mut buf_str);
+                            lines.push(buf_str.clone());
+                        }
+                        let encoded = lines.join("");
+                        let mut decoder = chunked_transfer::Decoder::new(encoded.as_bytes());
+                        decoder.read_to_string(&mut response);
+                    }
+                } else {
+                    while response.len() < usize::from_str(head.headers.get("Content-Length").unwrap_or(&String::from("0")).as_str()).unwrap_or(0) {
+                        let mut buf_str = String::new();
+                        reader.read_line(&mut buf_str);
+                        lines.push(buf_str.clone());
+                        response = lines.join("");
+                    }
+                };
+                head.body = Some(response);
+                head.clone()
             }
-        } else {
-            while response.len() < usize::from_str(head.headers.get("Content-Length").unwrap_or(&String::from("0")).as_str()).unwrap_or(0) {
-                let mut buf_str = String::new();
-                reader.read_line(&mut buf_str)?;
-                lines.push(buf_str.clone());
-                response = lines.join("");
+            None => {
+                let mut stream = self.tls.unwrap();
+                let mut reader = BufReader::new(&mut stream);
+                if !head.headers.contains_key("Content-Length") {
+                    if head.headers.get("Transfer-Encoding").unwrap_or(&String::new()) == &String::from("chunked") {
+                        while lines.last().unwrap_or(&String::from("")) != &String::from("\r\n") {
+                            let mut buf_str = String::new();
+                            reader.read_line(&mut buf_str);
+                            lines.push(buf_str.clone());
+                        }
+                        let encoded = lines.join("");
+                        let mut decoder = chunked_transfer::Decoder::new(encoded.as_bytes());
+                        decoder.read_to_string(&mut response);
+                    }
+                } else {
+                    while response.len() < usize::from_str(head.headers.get("Content-Length").unwrap_or(&String::from("0")).as_str()).unwrap_or(0) {
+                        let mut buf_str = String::new();
+                        reader.read_line(&mut buf_str);
+                        lines.push(buf_str.clone());
+                        response = lines.join("");
+                    }
+                };
+                head.body = Some(response);
+                head.clone()
             }
         };
-        Response::new()
     }
 }

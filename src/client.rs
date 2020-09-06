@@ -6,6 +6,7 @@ use std::sync::Arc;
 use rustls::{ClientSession, ClientConfig};
 use webpki_roots::TLS_SERVER_ROOTS;
 use std::time::Duration;
+use std::process::exit;
 
 pub fn get(req: &mut Request, upgraded: bool) -> CurioResult<Response> {
     let config = Arc::new(build_tls_config());
@@ -18,22 +19,35 @@ pub fn get(req: &mut Request, upgraded: bool) -> CurioResult<Response> {
             build_tls_connection(&mut tcp, &mut session)
         }
     };
+
     if upgraded {
-        conection = build_tls_connection(&mut tcp, &mut session);
+        println!("Upgraded request, building new connection");
+        connection = build_tls_connection(&mut tcp, &mut session);
     }
+
+
     let request = format!("GET {} HTTP/1.1\r\nUser-Agent: {}\r\nHost: {}\r\nConnection: close\r\n\r\n", req.path, req.user_agent, req.domain);
+    if upgraded {
+        println!("UPGRADE:\n{}", request.clone());
+    }
     connection = connection.write(request);
-    let head = connection.read_head();
+    if upgraded {
+        exit(101)
+    }
+    let (mut head, connection) = connection.read_head();
 
     return if head.status.unwrap() == 301 && head.headers.get("Location").unwrap().contains("https://") {
         if upgraded {
             Err(err_from_code(9)) // too many upgrades error (not implemented)
         } else {
-            get(req, true) // attempt to re-run the request using TLS to upgrade the connection
+            //get(req, true) // attempt to re-run the request using TLS to upgrade the connection
+            Err(err_from_code(301))
         }
     } else {
-        if head.headers.get("content-type").unwrap().contains("charset=utf-8") {
-            connection.read_body_string(head) // attempt to read the content body as plaintext into a string
+        if head.status.unwrap() >= 400 {
+            Err(err_from_code(head.status.unwrap() as u16))
+        } else if head.headers.get("content-type").unwrap().contains("charset=utf-8") {
+            Ok(connection.read_body_string(&mut head)) // attempt to read the content body as plaintext into a string
         } else {
             Err(err_from_code(10)) // unsupported content type
         }
@@ -62,7 +76,6 @@ fn build_tls_connection<'a>(stream: &'a mut TcpStream, session: &'a mut ClientSe
 fn parse_socket(domain: &String, port: &usize) -> SocketAddr {
     let info = format!("{}:{}", domain, port);
     let addresses = info.to_socket_addrs().unwrap();
-    println!("{:#?}", addresses.clone().last().unwrap());
     return addresses.last().unwrap();
 }
 
