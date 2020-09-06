@@ -337,10 +337,10 @@ impl Request {
 
     pub fn new_send(&mut self) -> crate::types::Result<Response> {
         return match self.request_type {
-            RequestType::GET => crate::client::get(&mut self),
+            RequestType::GET => crate::client::get(self, false),
             _ => {
                 println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
-                crate::client::get(&mut self)
+                crate::client::get(self, false)
             }
         };
     }
@@ -574,20 +574,22 @@ pub(crate) struct Connection<'a> {
 }
 
 impl <'a> Connection<'a> {
-    pub fn write<A:Into<String>>(mut self, content: A) {
+    pub fn write<A:Into<String>>(mut self, content: A) -> Connection<'a> {
         let ct = content.into();
         match self.tcp {
             Some(mut stream) => {
                 stream.write_all(ct.as_bytes());
                 stream.flush();
+                self.tcp = Some(stream);
             },
             None => {
                 let mut stream = self.tls.unwrap();
                 stream.write_all(ct.as_bytes());
                 stream.flush();
-                self.tls = Some(stream)
+                self.tls = Some(stream);
             }
         };
+        self
     }
 
     pub fn read_head(mut self) -> Response {
@@ -635,5 +637,29 @@ impl <'a> Connection<'a> {
                 Response::new(String::new(), head)
             }
         }
+    }
+
+    pub fn read_body_string(mut self, head: Response) -> Response {
+        let mut lines: Vec<String> = Vec::new();
+        if !head.headers.contains_key("Content-Length") {
+            if head.headers.get("Transfer-Encoding").unwrap_or(&String::new()) == &String::from("chunked") {
+                while lines.last().unwrap_or(&String::from("")) != &String::from("\r\n") {
+                    let mut buf_str = String::new();
+                    reader.read_line(&mut buf_str)?;
+                    lines.push(buf_str.clone());
+                }
+                let encoded = lines.join("");
+                let mut decoder = chunked_transfer::Decoder::new(encoded.as_bytes());
+                decoder.read_to_string(&mut response)?;
+            }
+        } else {
+            while response.len() < usize::from_str(head.headers.get("Content-Length").unwrap_or(&String::from("0")).as_str()).unwrap_or(0) {
+                let mut buf_str = String::new();
+                reader.read_line(&mut buf_str)?;
+                lines.push(buf_str.clone());
+                response = lines.join("");
+            }
+        };
+        Response::new()
     }
 }

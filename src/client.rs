@@ -7,22 +7,37 @@ use rustls::{ClientSession, ClientConfig};
 use webpki_roots::TLS_SERVER_ROOTS;
 use std::time::Duration;
 
-pub fn get(req: &mut Request) -> CurioResult<Response> {
+pub fn get(req: &mut Request, upgraded: bool) -> CurioResult<Response> {
     let config = Arc::new(build_tls_config());
     let dns_ref = DNSNameRef::try_from_ascii_str(&req.domain.as_str()).unwrap();
     let mut session = build_tls_session(&config, &dns_ref);
     let mut tcp = build_tcp_stream(&req.domain, &req.port);
-    let connection = match req.protocol {
+    let mut connection = match req.protocol {
         HTTPProtocol::HTTP => build_tcp_connection(&mut tcp),
         HTTPProtocol::HTTPS => {
-            build_tls_connection(&req.protocol, &mut tcp, &mut session)
+            build_tls_connection(&mut tcp, &mut session)
         }
     };
-
+    if upgraded {
+        conection = build_tls_connection(&mut tcp, &mut session);
+    }
     let request = format!("GET {} HTTP/1.1\r\nUser-Agent: {}\r\nHost: {}\r\nConnection: close\r\n\r\n", req.path, req.user_agent, req.domain);
-    connection.write(request);
+    connection = connection.write(request);
     let head = connection.read_head();
-    Ok(head)
+
+    return if head.status.unwrap() == 301 && head.headers.get("Location").unwrap().contains("https://") {
+        if upgraded {
+            Err(err_from_code(9)) // too many upgrades error (not implemented)
+        } else {
+            get(req, true) // attempt to re-run the request using TLS to upgrade the connection
+        }
+    } else {
+        if head.headers.get("content-type").unwrap().contains("charset=utf-8") {
+            connection.read_body_string(head) // attempt to read the content body as plaintext into a string
+        } else {
+            Err(err_from_code(10)) // unsupported content type
+        }
+    };
 }
 
 fn build_tcp_stream(domain: &String, port: &usize) -> TcpStream {
@@ -37,7 +52,7 @@ fn build_tcp_connection(stream: &mut TcpStream) -> Connection {
     }
 }
 
-fn build_tls_connection<'a>(protocol: &HTTPProtocol, stream: &'a mut TcpStream, session: &'a mut ClientSession) -> Connection<'a> {
+fn build_tls_connection<'a>(stream: &'a mut TcpStream, session: &'a mut ClientSession) -> Connection<'a> {
     Connection {
         tcp: None,
         tls: Some(rustls::Stream::new(session, stream)),
