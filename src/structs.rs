@@ -1,10 +1,9 @@
 use crate::utils;
 use std::collections::HashMap;
 use crate::utils::parsers;
-use std::str::FromStr;
-use std::time::Duration;
 use std::net::TcpStream;
 use rustls::{Stream, ClientSession};
+use std::io::{Write, BufReader, BufRead};
 
 /// Defines the method to be used in the request
 #[derive(Debug, Clone)]
@@ -336,12 +335,12 @@ impl Request {
         self
     }
 
-    pub fn new_send(&self) -> crate::types::Result<Response> {
+    pub fn new_send(&mut self) -> crate::types::Result<Response> {
         return match self.request_type {
-            RequestType::GET => crate::client::get(&self),
+            RequestType::GET => crate::client::get(&mut self),
             _ => {
                 println!("Error: {:?} is currently not implemented, switching to GET", self.request_type);
-                crate::client::get(&self)
+                crate::client::get(&mut self)
             }
         };
     }
@@ -541,7 +540,7 @@ impl Client {
         }
     }
 
-    pub fn send(mut self, request: Request) -> crate::types::Result<Response> {
+    pub fn send(mut self, request: &mut Request) -> crate::types::Result<Response> {
         return request.new_send();
     }
 
@@ -575,13 +574,65 @@ pub(crate) struct Connection<'a> {
 }
 
 impl <'a> Connection<'a> {
-    pub fn write<A:Into<String>>(&mut self, content: A) {
+    pub fn write<A:Into<String>>(mut self, content: A) {
+        let ct = content.into();
         match self.tcp {
-            Some(stream) => {
-                stream.write
+            Some(mut stream) => {
+                stream.write_all(ct.as_bytes());
+                stream.flush();
             },
             None => {
+                let mut stream = self.tls.unwrap();
+                stream.write_all(ct.as_bytes());
+                stream.flush();
+                self.tls = Some(stream)
+            }
+        };
+    }
 
+    pub fn read_head(mut self) -> Response {
+        match self.tcp {
+            Some(mut stream) => {
+                let mut reader = BufReader::new(&mut stream);
+
+                let mut head_line = String::new();
+                let mut lines: Vec<String> = Vec::new();
+
+                reader.read_line(&mut head_line);
+                lines.push(head_line.clone());
+
+                while lines.last().unwrap() != &String::from("\r\n") {
+                    let mut buf_str = String::new();
+                    reader.read_line(&mut buf_str);
+                    lines.push(buf_str.clone())
+                }
+
+                lines.pop();
+
+                let head = lines;
+                Response::new(String::new(), head)
+            },
+            None => {
+                let mut stream = self.tls.unwrap();
+                let mut reader = BufReader::new(&mut stream);
+
+                let mut head_line = String::new();
+                let mut lines: Vec<String> = Vec::new();
+
+                reader.read_line(&mut head_line);
+                lines.push(head_line.clone());
+
+                while lines.last().unwrap() != &String::from("\r\n") {
+                    let mut buf_str = String::new();
+                    reader.read_line(&mut buf_str);
+                    lines.push(buf_str.clone())
+                }
+
+                lines.pop();
+
+                let head = lines;
+                self.tls = Some(stream);
+                Response::new(String::new(), head)
             }
         }
     }

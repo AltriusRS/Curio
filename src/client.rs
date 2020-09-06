@@ -1,14 +1,13 @@
 use crate::structs::{Connection, Response, Request, HTTPProtocol};
-use crate::types::Result as CurioResult;
-use std::net::{TcpStream, SocketAddr, IpAddr, Ipv4Addr, ToSocketAddrs};
+use crate::types::{Result as CurioResult, err_from_code};
+use std::net::{TcpStream, SocketAddr, ToSocketAddrs};
 use webpki::DNSNameRef;
 use std::sync::Arc;
 use rustls::{ClientSession, ClientConfig};
 use webpki_roots::TLS_SERVER_ROOTS;
-use std::str::FromStr;
 use std::time::Duration;
 
-pub fn get(req: &Request) -> CurioResult<Response> {
+pub fn get(req: &mut Request) -> CurioResult<Response> {
     let config = Arc::new(build_tls_config());
     let dns_ref = DNSNameRef::try_from_ascii_str(&req.domain.as_str()).unwrap();
     let mut session = build_tls_session(&config, &dns_ref);
@@ -20,19 +19,11 @@ pub fn get(req: &Request) -> CurioResult<Response> {
         }
     };
 
-    let request = format!("GET {} HTTP/1.1\r\nUser-Agent: {}\r\nHost: {}\r\n\\r\n", req.path, req.user_agent, req.domain);
-    return match req.protocol {
-        HTTPProtocol::HTTPS => {
-            connection.write(request);
-            Err(crate::types::err_from_code(301))
-        }
-        HTTPProtocol::HTTP => {
-            connection.write(request);
-            Err(crate::types::err_from_code(0))
-        }
-    };
+    let request = format!("GET {} HTTP/1.1\r\nUser-Agent: {}\r\nHost: {}\r\nConnection: close\r\n\r\n", req.path, req.user_agent, req.domain);
+    connection.write(request);
+    let head = connection.read_head();
+    Ok(head)
 }
-
 
 fn build_tcp_stream(domain: &String, port: &usize) -> TcpStream {
     let address = parse_socket(&domain, &port);
